@@ -1,0 +1,42 @@
+# SenseNova（商汤 Token Plan）脱敏配置模板
+#
+# 复制本文件的内容到 DSH 的 ~/.dsh/settings.yaml（在 llm-pi-ai.providers 下）。
+#
+# ⚠️ 安全提示：本模板不包含任何真实 API key。
+#    key 通过环境变量 SENSENOVA_API_KEY 引用，启动 DSH 前先 export：
+#      export SENSENOVA_API_KEY=<你的key>
+#    切勿把真实 key 写进 settings.yaml 或任何提交到 git 的文件。
+
+sensenova:
+  displayName: SenseNova 商汤 Token Plan
+  apiKeyEnv: SENSENOVA_API_KEY        # 环境变量名（不是 key 本身）
+  api: openai-completions
+  baseURL: https://token.sensenova.cn/v1
+  defaultContextWindow: 262144
+  defaultMaxTokens: 65536
+
+  # ── 重试策略（推荐配置，详见 docs/retry-policy.md）───────────────────────
+  # mode: normal —— 只对可重试错误重试，且有次数上限，避免无限卡死
+  retryPolicy:
+    mode: normal
+    maxRetries: 15                    # 最多重试 15 次（约覆盖 8 分钟短暂限流）
+    retryableCodes:
+      - RATE_LIMIT                    # HTTP 429 / rate limit
+      - TIMEOUT                       # 请求超时
+      - SERVER                        # 服务器 5xx
+      - TRANSPORT                     # 网络层错误
+    backoff:
+      initialDelayMs: 1000            # 首次等待 1s
+      maxDelayMs: 30000               # 退避上限 30s
+      jitterRatio: 0.3                # ±30% 抖动，避免惊群
+
+  # ── 可选模型清单 ─────────────────────────────────────────────────────────
+  models:
+    - id: deepseek-v4-flash
+      name: DeepSeek V4 Flash (SenseNova)
+      contextWindow: 1048576
+      maxTokens: 65536
+    - id: glm-5.2
+      name: GLM-5.2 (SenseNova)
+      contextWindow: 1048576
+      maxTokens: 131072
