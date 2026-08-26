@@ -13,7 +13,8 @@ DSH 在每次重试时会追加事件 `llm/retry` 和 `llm/retry-started`。观�
 
 | 症状 | 可能原因 | 处理 |
 |---|---|---|
-| 偶尔 429，重试后恢复 | 短时 QPS 突发 | 正常，无需处理 |
+| 偶尔 429（`RATE_LIMIT`），重试后恢复 | 短时 QPS 突发 / TPM 配额（如 `429001 tpm exhausted`） | 正常，无需处理 |
+| 报 `QUOTA`（`Allocated quota exceeded / insufficient_quota`） | 账户配额/余额超限 | 检查套餐配额；如为分钟级配额则自动重试可恢复（`retryableCodes` 需含 `QUOTA`） |
 | 持续 429，15 次都失败 | Token 套餐 QPS 配额低 | 降并发 / 升级套餐 / 增大退避间隔 |
 | 报 402/403 配额或余额 | 余额不足 / 账号冻结 | 充值 / 联系供应商 |
 | 报 401 认证失败 | API key 错误 | 检查 `SENSENOVA_API_KEY` 环境变量 |
@@ -29,7 +30,7 @@ DSH 在每次重试时会追加事件 `llm/retry` 和 `llm/retry-started`。观�
 retryPolicy:
   mode: normal
   maxRetries: 20
-  retryableCodes: [RATE_LIMIT, TIMEOUT, SERVER, TRANSPORT]
+  retryableCodes: [RATE_LIMIT, QUOTA, TIMEOUT, SERVER, TRANSPORT]
   backoff:
     initialDelayMs: 2000
     maxDelayMs: 60000

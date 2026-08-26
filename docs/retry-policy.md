@@ -78,8 +78,30 @@ turnEnds = { kind: "error", error: error.failure }
 - `maxRetries: 15` + 退避到 30s ≈ 覆盖 **8 分钟**短暂限流窗口，绝大多数限流能熬过去
 - 持续性问题会在约 8 分钟后失败并报错，方便排查，不会无限空等
 
+## 实战：两种 429 的区别（重要）
+
+SenseNova（商汤）实际会产生**两种形态的 429**，归一化后走向不同的 code —— 配置时必须都覆盖：
+
+| 错误消息 | 归一化匹配 | 结果 code |
+|---|---|---|
+| `429: {"message":"inference tpm exhausted","code":"429001"}` | 消息含 `429` → `\b429\b` 命中 | `RATE_LIMIT` |
+| `429: {"message":"Allocated quota exceeded...","code":"insufficient_quota"}` | `quota exceeded` → `isQuotaExceededError()` **优先命中** | `QUOTA` |
+
+注意 `classifyPiAiError` 的判断**顺序**：
+
+```js
+if (/\b(?:401|403)\b/.test(message)) return "AUTH";
+if (isQuotaExceededError(message)) return "QUOTA";     // ← 在 \b429\b 之前！
+if (/\b429\b|rate.?limit/i.test(message)) return "RATE_LIMIT";
+...
+```
+
+所以 `"Allocated quota exceeded"` 会在 `429` 检查**之前**被归为 `QUOTA`。**如果 `retryableCodes` 里只有 `RATE_LIMIT` 而没有 `QUOTA`，这类错误会直接失败、不重试。**
+
+**结论**：`retryableCodes` 必须同时包含 `RATE_LIMIT` 和 `QUOTA`（见 `config/sensenova.yaml`）。两者都在时，两种 429 都会自动退避重试；配合 `maxRetries: 15` 上限，持续性问题仍会在约 8 分钟后暴露，不会无限卡死。
+
 ## 参考
 
 - 重试执行器：`@deepseek-ai/dsh-llm-retry`
 - 策略 schema：`@deepseek-ai/dsh-llm/lib/types/retry-policy.js`（默认 `normal`，`maxRetries=5`，`retryableCodes` 含 `RATE_LIMIT/TIMEOUT/SERVER/TRANSPORT`）
-- 429 归一化：`@deepseek-ai/dsh-llm-pi-ai`
+- 错误归一化：`@deepseek-ai/dsh-llm-pi-ai`（`classifyPiAiError` / `isQuotaExceededError`）

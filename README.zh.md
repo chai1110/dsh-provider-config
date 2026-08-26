@@ -1,4 +1,4 @@
-# DSH Provider Config — DSH 供应商配置模板与重试机制
+# DSH Provider Config
 
 > 为 [DeepSeek Harness (DSH)](https://github.com/deepseek-ai/deepseek-harness) 提供**经过实战验证**的 LLM 供应商配置模板与**限流重试机制**最佳实践。当前聚焦 SenseNova（商汤 Token Plan），结构可扩展到其他 OpenAI 兼容供应商。
 
@@ -16,17 +16,18 @@ DSH 通过 `~/.dsh/settings.yaml` 配置 LLM 供应商。其中最关键、也�
 
 | 路径 | 说明 |
 |---|---|
-| `config/sensenova.yaml` | SenseNova 供应商的**脱敏配置模板**（可复制进 `~/.dsh/settings.yaml`） |
+| `config/sensenova.yaml` | SenseNova 供应商的**配置模板**（可复制进 `~/.dsh/settings.yaml`） |
 | `docs/retry-policy.md` | 重试机制详解：`normal` vs `always`、指数退避、抖动、次数上限的权衡 |
 | `docs/troubleshooting.md` | 限流排查指南：怎么判断是短暂限流还是持续性问题 |
 
 ## 快速开始
 
-1. 查看脱敏模板：`config/sensenova.yaml`
+1. 查看配置模板：`config/sensenova.yaml`
 2. 阅读重试机制：`docs/retry-policy.md`
 3. 按需复制到你的 `~/.dsh/settings.yaml`
+4. 重启 DSH，享受遇到限流自动重试
 
-## 配置模板（脱敏）
+## 配置模板
 
 见 [`config/sensenova.yaml`](config/sensenova.yaml)。模板中**不包含任何真实 API key**，key 一律通过环境变量 `SENSENOVA_API_KEY` 引用。
 

@@ -1,4 +1,4 @@
-# SenseNova（商汤 Token Plan）脱敏配置模板
+# SenseNova（商汤 Token Plan）配置模板
 #
 # 复制本文件的内容到 DSH 的 ~/.dsh/settings.yaml（在 llm-pi-ai.providers 下）。
 #
@@ -22,6 +22,7 @@ sensenova:
     maxRetries: 15                    # 最多重试 15 次（约覆盖 8 分钟短暂限流）
     retryableCodes:
       - RATE_LIMIT                    # HTTP 429 / rate limit
+      - QUOTA                         # 配额超限（Allocated quota exceeded / insufficient_quota）
       - TIMEOUT                       # 请求超时
       - SERVER                        # 服务器 5xx
       - TRANSPORT                     # 网络层错误
