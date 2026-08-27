@@ -1,4 +1,5 @@
 # DSH Provider Config
+> 📖 [中文版](README.zh.md)
 
 > Field-tested LLM **provider configuration templates** and **rate-limit retry best practices** for [DeepSeek Harness (DSH)](https://github.com/deepseek-ai/deepseek-harness). Currently focused on SenseNova (商汤 Token Plan), structured to extend to any OpenAI-compatible provider.
 
