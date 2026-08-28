@@ -33,6 +33,11 @@ sensenova:
 
   # ── 可选模型清单 ─────────────────────────────────────────────────────────
   models:
+    - id: sensenova-6.8-flash-lite
+      name: SenseNova 6.8 Flash Lite (SenseNova)
+      description: 轻量多模态智能体模型（文本+图片输入），支持 tools/json_mode/reasoning，Flash-Lite 专属积分有返赠活动
+      contextWindow: 262144
+      maxTokens: 65536
     - id: deepseek-v4-flash
       name: DeepSeek V4 Flash (SenseNova)
       contextWindow: 1048576
