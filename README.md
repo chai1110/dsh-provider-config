@@ -1,47 +1,47 @@
 # DSH Provider Config
-> 📖 [中文版](README.zh.md)
+> 📖 [English](README.en.md)
 
-> Field-tested LLM **provider configuration templates** and **rate-limit retry best practices** for [DeepSeek Harness (DSH)](https://github.com/deepseek-ai/deepseek-harness). Currently focused on SenseNova (商汤 Token Plan), structured to extend to any OpenAI-compatible provider.
+> 为 [DeepSeek Harness (DSH)](https://github.com/deepseek-ai/deepseek-harness) 提供**经过实战验证**的 LLM 供应商配置模板与**限流重试机制**最佳实践。当前聚焦 SenseNova（商汤 Token Plan），结构可扩展到其他 OpenAI 兼容供应商。
 
-## Why this project
+## 为什么需要这个项目
 
-DSH configures LLM providers via `~/.dsh/settings.yaml`. The most critical — yet most overlooked — piece is **`retryPolicy`**. It decides:
+DSH 通过 `~/.dsh/settings.yaml` 配置 LLM 供应商。其中最关键、也最容易被忽略的是 **`retryPolicy`（重试策略）**——它直接决定了：
 
-- Whether a task auto-recovers when hitting rate limits (HTTP 429 / `RATE_LIMIT`)
-- How long retries continue before giving up, and whether it can hang forever
-- Whether persistent provider failures surface an error you can actually diagnose
+- 遇到限流（HTTP 429 / RATE_LIMIT）时，任务能否自动恢复
+- 重试多久后放弃，会不会无限卡死
+- 供应商持续故障时，能否及时暴露错误让你排查
 
-This project distills these settings into ready-to-use templates and explains what every parameter means and the tradeoffs.
+本项目把这些配置整理成**可直接套用的模板**，并解释每个参数的含义与权衡。
 
-## Contents
+## 项目内容
 
-| Path | Description |
+| 路径 | 说明 |
 |---|---|
-| `config/sensenova.yaml` | Ready-to-use SenseNova provider template (copy into `~/.dsh/settings.yaml`) |
-| `docs/retry-policy.md` | Retry mechanics in depth: `normal` vs `always`, exponential backoff, jitter, retry-count tradeoffs |
-| `docs/troubleshooting.md` | Rate-limit troubleshooting: telling short bursts from persistent problems |
+| `config/sensenova.yaml` | SenseNova 供应商的**配置模板**（可复制进 `~/.dsh/settings.yaml`） |
+| `docs/retry-policy.md` | 重试机制详解：`normal` vs `always`、指数退避、抖动、次数上限的权衡 |
+| `docs/troubleshooting.md` | 限流排查指南：怎么判断是短暂限流还是持续性问题 |
 
-## Quick start
+## 快速开始
 
-1. Open the template: `config/sensenova.yaml`
-2. Read the retry mechanics: `docs/retry-policy.md`
-3. Copy what you need into your `~/.dsh/settings.yaml`
-4. Restart DSH, and enjoy automatic retry on rate limits
+1. 查看配置模板：`config/sensenova.yaml`
+2. 阅读重试机制：`docs/retry-policy.md`
+3. 按需复制到你的 `~/.dsh/settings.yaml`
+4. 重启 DSH，享受遇到限流自动重试
 
-## Configuration template
+## 配置模板
 
-See [`config/sensenova.yaml`](config/sensenova.yaml). The template contains **no real API keys** — keys are referenced exclusively through the environment variable `SENSENOVA_API_KEY`.
+见 [`config/sensenova.yaml`](config/sensenova.yaml)。模板中**不包含任何真实 API key**，key 一律通过环境变量 `SENSENOVA_API_KEY` 引用。
 
-## Retry policy at a glance
+## 重试机制速览
 
-- **Recommended**: `mode: normal` + `maxRetries: 15` + `retryableCodes: [RATE_LIMIT, TIMEOUT, SERVER, TRANSPORT]`
-- Exponential backoff `initialDelayMs → maxDelayMs` with jitter to avoid thundering-herd
-- Full tradeoff analysis in [`docs/retry-policy.md`](docs/retry-policy.md)
+- **推荐** `mode: normal` + `maxRetries: 15` + `retryableCodes: [RATE_LIMIT, TIMEOUT, SERVER, TRANSPORT]`
+- 指数退避 `initialDelayMs → maxDelayMs`，叠加抖动（jitter）避免惊群
+- 详细的利弊权衡见 [`docs/retry-policy.md`](docs/retry-policy.md)
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT — 见 [LICENSE](LICENSE)。
 
-## Security
+## 安全声明
 
-This project **never contains real API keys**. Keys are referenced only by environment-variable name (e.g. `SENSENOVA_API_KEY`); templates contain nothing but the env-var name. See [SECURITY.md](SECURITY.md).
+本项目**绝不包含真实 API key**。所有 key 一律通过环境变量引用（如 `SENSENOVA_API_KEY`），配置模板中只出现环境变量名。详见 [SECURITY.md](SECURITY.md)。
