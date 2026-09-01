@@ -82,6 +82,26 @@ sensenova:
         low: low
         medium: medium
         high: high
+    - id: deepseek-v4-pro
+      name: DeepSeek V4 Pro (SenseNova)
+      contextWindow: 1048576
+      maxTokens: 65536
+      # 旗舰 thinking 模型，1M 上下文，工具调用。同样声明 reasoningEfforts（原因见上）。
+      reasoningEfforts:
+        off:
+        low: low
+        medium: medium
+        high: high
+    - id: kimi-k3
+      name: Kimi K3 (SenseNova)
+      contextWindow: 1048576
+      maxTokens: 65536
+      # Kimi 新一代 thinking 模型，1M 上下文，工具调用。同样声明 reasoningEfforts（原因见上）。
+      reasoningEfforts:
+        off:
+        low: low
+        medium: medium
+        high: high
     - id: glm-5.2
       name: GLM-5.2 (SenseNova)
       contextWindow: 1048576
