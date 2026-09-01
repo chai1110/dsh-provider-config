@@ -15,6 +15,38 @@ sensenova:
   defaultContextWindow: 262144
   defaultMaxTokens: 65536
 
+  # ── reasoning_content / developer role 修复（provider 级）──────────────────
+  # DSH 的 pi-ai 适配器把 SenseNova 网关（token.sensenova.cn）当作"标准 OpenAI
+  # 端点"，两项默认行为会在网关上的 thinking 模型（deepseek-v4-flash、glm-5.2）
+  # 上触发 400001 错误：
+  #
+  #   1. requiresReasoningContentOnAssistantMessages 默认 false —— pi-ai 仅对
+  #      provider=deepseek 或 baseURL 含 deepseek.com 自动补 reasoning_content，
+  #      SenseNova 两者都不满足。thinking 模式下，带 tool_calls 的 assistant
+  #      历史消息若缺 reasoning_content，网关返回：
+  #        400 {"code":"400001","message":"If thinking mode and tool_calls,
+  #             `reasoning_content` must be passed back to the API."}
+  #
+  #   2. supportsDeveloperRole 默认 true —— 模型被标记为 reasoning 后，pi-ai 会
+  #      把 system 消息改成 developer role（OpenAI reasoning 惯例），但 SenseNova
+  #      网关只接受 system/assistant/user/tool：
+  #        400 {"code":"400001","message":"...invalid value: `developer`..."}
+  #
+  # 这两项是网关级问题，与具体模型无关——凡网关上的 thinking 模型都会中招。
+  # 在 provider 级统一修正；对非 thinking 模型（如 sensenova-6.8-flash-lite）
+  # 无副作用，因其 model.reasoning=false 时上述逻辑均不触发。
+  # 对话变长触发自动压缩时，压缩的摘要请求也会重放历史，故该问题会让会话
+  # "卡死"（压缩与后续请求持续 400001）。本配置同时修复普通请求与压缩路径。
+  #
+  # ⚠️ 验证状态：
+  #   - developer role 错误（第 2 点）：已实测确认（400 复现 + 修正后不再报）。
+  #   - reasoning_content 错误（第 1 点）：源码逻辑链确证（pi-ai L924-928 兜底
+  #     逻辑即为此错误设计），但原始出错会话已被清除，纯 API 调用未能复现，
+  #     待长对话 + tool_call 实测最终确认。
+  compat:
+    requiresReasoningContentOnAssistantMessages: true
+    supportsDeveloperRole: false
+
   # ── 重试策略（推荐配置，详见 docs/retry-policy.md）───────────────────────
   # mode: normal —— 只对可重试错误重试，且有次数上限，避免无限卡死
   retryPolicy:
@@ -42,7 +74,21 @@ sensenova:
       name: DeepSeek V4 Flash (SenseNova)
       contextWindow: 1048576
       maxTokens: 65536
+      # thinking 模型：声明 reasoningEfforts 让该模型被识别为 reasoning（pi-ai 的
+      # reasoning_content 兜底逻辑要求 model.reasoning=true 才触发）。
+      # off 留空值：未指定 effort 时不向网关发 reasoning_effort 参数，保持默认行为。
+      reasoningEfforts:
+        off:
+        low: low
+        medium: medium
+        high: high
     - id: glm-5.2
       name: GLM-5.2 (SenseNova)
       contextWindow: 1048576
       maxTokens: 131072
+      # 同为 thinking 模型，同样需要声明 reasoningEfforts（原因见上）。
+      reasoningEfforts:
+        off:
+        low: low
+        medium: medium
+        high: high
