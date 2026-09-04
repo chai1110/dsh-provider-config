@@ -30,7 +30,7 @@ This project distills these settings into ready-to-use templates and explains wh
 
 ## Configuration template
 
-See [`config/sensenova.yaml`](config/sensenova.yaml). The template contains **no real API keys** — keys are referenced exclusively through the environment variable `SENSENOVA_API_KEY`.
+See [`config/sensenova.yaml`](config/sensenova.yaml). Keys are referenced through the environment variable `SENSENOVA_API_KEY`.
 
 ## Retry policy at a glance
 
@@ -41,7 +41,3 @@ See [`config/sensenova.yaml`](config/sensenova.yaml). The template contains **no
 ## License
 
 MIT — see [LICENSE](LICENSE).
-
-## Security
-
-This project **never contains real API keys**. Keys are referenced only by environment-variable name (e.g. `SENSENOVA_API_KEY`); templates contain nothing but the env-var name. See [SECURITY.md](SECURITY.md).

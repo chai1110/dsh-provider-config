@@ -4,7 +4,7 @@ Thanks for your interest in contributing!
 
 ## What We Accept
 
-- 新的供应商配置模板（脱敏，不含真实 key）
+- 新的供应商配置模板
 - 重试机制 / 限流排查的改进文档
 - 配置模板的 bug 修复
 

@@ -30,7 +30,7 @@ DSH 通过 `~/.dsh/settings.yaml` 配置 LLM 供应商。其中最关键、也�
 
 ## 配置模板
 
-见 [`config/sensenova.yaml`](config/sensenova.yaml)。模板中**不包含任何真实 API key**，key 一律通过环境变量 `SENSENOVA_API_KEY` 引用。
+见 [`config/sensenova.yaml`](config/sensenova.yaml)。key 通过环境变量 `SENSENOVA_API_KEY` 引用。
 
 ## 重试机制速览
 
@@ -41,7 +41,3 @@ DSH 通过 `~/.dsh/settings.yaml` 配置 LLM 供应商。其中最关键、也�
 ## License
 
 MIT — 见 [LICENSE](LICENSE)。
-
-## 安全声明
-
-本项目**绝不包含真实 API key**。所有 key 一律通过环境变量引用（如 `SENSENOVA_API_KEY`），配置模板中只出现环境变量名。详见 [SECURITY.md](SECURITY.md)。

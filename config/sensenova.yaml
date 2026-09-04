@@ -2,14 +2,12 @@
 #
 # 复制本文件的内容到 DSH 的 ~/.dsh/settings.yaml（在 llm-pi-ai.providers 下）。
 #
-# ⚠️ 安全提示：本模板不包含任何真实 API key。
-#    key 通过环境变量 SENSENOVA_API_KEY 引用，启动 DSH 前先 export：
-#      export SENSENOVA_API_KEY=<你的key>
-#    切勿把真实 key 写进 settings.yaml 或任何提交到 git 的文件。
+# key 通过环境变量 SENSENOVA_API_KEY 引用，启动 DSH 前先 export：
+#   export SENSENOVA_API_KEY=<你的key>
 
 sensenova:
   displayName: SenseNova 商汤 Token Plan
-  apiKeyEnv: SENSENOVA_API_KEY        # 环境变量名（不是 key 本身）
+  apiKeyEnv: SENSENOVA_API_KEY
   api: openai-completions
   baseURL: https://token.sensenova.cn/v1
   defaultContextWindow: 262144
