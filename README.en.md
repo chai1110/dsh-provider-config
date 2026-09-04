@@ -3,6 +3,8 @@
 
 > Field-tested LLM **provider configuration templates** and **rate-limit retry best practices** for [DeepSeek Harness (DSH)](https://github.com/deepseek-ai/deepseek-harness). Currently focused on SenseNova (商汤 Token Plan), structured to extend to any OpenAI-compatible provider.
 
+> **Versioning**: this repo is pure config templates — **not tied to any specific DSH version** (settings.yaml works across versions); git tags (e.g. `v0.1.2-rc.1`) merely mark template release points.
+
 ## Why this project
 
 DSH configures LLM providers via `~/.dsh/settings.yaml`. The most critical — yet most overlooked — piece is **`retryPolicy`**. It decides:

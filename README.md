@@ -3,6 +3,8 @@
 
 > 为 [DeepSeek Harness (DSH)](https://github.com/deepseek-ai/deepseek-harness) 提供**经过实战验证**的 LLM 供应商配置模板与**限流重试机制**最佳实践。当前聚焦 SenseNova（商汤 Token Plan），结构可扩展到其他 OpenAI 兼容供应商。
 
+> **版本管理**：本仓库为纯配置模板，**不依赖特定 DSH 版本**（settings.yaml 配置通用于各版本）；git tag（如 `v0.1.2-rc.1`）仅用于标记模板自身的发布点。
+
 ## 为什么需要这个项目
 
 DSH 通过 `~/.dsh/settings.yaml` 配置 LLM 供应商。其中最关键、也最容易被忽略的是 **`retryPolicy`（重试策略）**——它直接决定了：
