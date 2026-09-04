@@ -2,7 +2,7 @@
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability, please report it privately to heitieya@163.com.
+If you discover a security vulnerability, please report it privately to chai011379@gmail.com.
 
 **Never include real API keys or credentials in issues, pull requests, or any public channel.**
 
