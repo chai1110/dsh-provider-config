@@ -48,6 +48,12 @@ DSH 通过 `~/.dsh/settings.yaml` 配置 LLM 供应商。其中最关键、也�
 |---|---|---|
 | `0.1.2-rc.1` | ✅ 模板基准版本 | — |
 | **`0.1.5-rc.1`** | ✅ **模板无需改动** | 见下 |
+| **`0.1.7-rc.2`** | ✅ **配置键全部有效；⚠️ 配置位置迁移** | 见下 |
+
+**0.1.7-rc.2 核对（2026-09-26）**
+
+- `dsh-llm-retry` 的 schema 仍含 `retryableCodes` / `initialDelayMs` / `maxDelayMs` / `jitterRatio` / `backoff`，`dsh-llm-pi-ai` 仍含 `baseURL` / `defaultContextWindow` / `defaultMaxTokens` / `reasoningEfforts` / `compat` / `displayName` / `apiKeyEnv` —— 全部有效。
+- **⚠️ 配置位置迁移（0.1.5 起）**：`~/.dsh/settings.yaml` 的供应商配置由 dsh 自动迁移至 **profile 补丁层 `~/.dsh/profiles/web/cordis.patch.yml`**（原文件改名 `settings.yaml.imported`，本机已实证：迁移后的配置在 0.1.7-rc.2 上 `agent-default-model` 仍解析为 sensenova/deepseek-v4-flash）。**新装用户把模板写入 `cordis.patch.yml` 的 `llm-pi-ai:` 段**。
 
 **0.1.5-rc.1 逐项核对（2026-09-10）**
 
