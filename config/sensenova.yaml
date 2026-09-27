@@ -80,11 +80,11 @@ sensenova:
         low: low
         medium: medium
         high: high
-    - id: deepseek-v4-pro
-      name: DeepSeek V4 Pro (SenseNova)
+    - id: deepseek-flash
+      name: DeepSeek V4.1 Flash (SenseNova)
       contextWindow: 1048576
       maxTokens: 65536
-      # 旗舰 thinking 模型，1M 上下文，工具调用。同样声明 reasoningEfforts（原因见上）。
+      # 新一代高效通用模型（V4.1 Flash），1M 上下文，工具调用。同样声明 reasoningEfforts（原因见上）。
       reasoningEfforts:
         off:
         low: low
