@@ -68,18 +68,6 @@ sensenova:
       description: 轻量多模态智能体模型（文本+图片输入），支持 tools/json_mode/reasoning，Flash-Lite 专属积分有返赠活动
       contextWindow: 262144
       maxTokens: 65536
-    - id: deepseek-v4-flash
-      name: DeepSeek V4 Flash (SenseNova)
-      contextWindow: 1048576
-      maxTokens: 65536
-      # thinking 模型：声明 reasoningEfforts 让该模型被识别为 reasoning（pi-ai 的
-      # reasoning_content 兜底逻辑要求 model.reasoning=true 才触发）。
-      # off 留空值：未指定 effort 时不向网关发 reasoning_effort 参数，保持默认行为。
-      reasoningEfforts:
-        off:
-        low: low
-        medium: medium
-        high: high
     - id: deepseek-flash
       name: DeepSeek V4.1 Flash (SenseNova)
       contextWindow: 1048576

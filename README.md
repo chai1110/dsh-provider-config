@@ -55,7 +55,7 @@ DSH 通过 `~/.dsh/settings.yaml` 配置 LLM 供应商。其中最关键、也�
 
 - `deepseek-v4-pro` 已从控制台下线 → 模板与示例配置移除（⚠️ API /v1/models 当时仍列出该 ID，但控制台计划不含即不可用）；
 - 新增 `deepseek-flash`（DeepSeek V4.1 Flash，ctx 1M / maxout 65536，tools+json+reasoning）；
-- 模板与示例配置同步更新；默认模型已改为 `deepseek-flash`（V4.1 Flash，2026-09-27 用户指定；`deepseek-v4-flash` 实测出话正常，V4.1 Flash 亦在清单）。
+- 模板与示例配置同步更新；默认模型：`deepseek-flash`（V4.1 Flash）；`deepseek-v4-flash` 与 `deepseek-v4-pro` 均已从模板与清单移除（2026-09-27 用户指定：有 4.1 就不需要 4）。
 **0.1.7-rc.2 核对（2026-09-26）**
 
 - `dsh-llm-retry` 的 schema 仍含 `retryableCodes` / `initialDelayMs` / `maxDelayMs` / `jitterRatio` / `backoff`，`dsh-llm-pi-ai` 仍含 `baseURL` / `defaultContextWindow` / `defaultMaxTokens` / `reasoningEfforts` / `compat` / `displayName` / `apiKeyEnv` —— 全部有效。
