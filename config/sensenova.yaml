@@ -78,6 +78,16 @@ sensenova:
         low: low
         medium: medium
         high: high
+    - id: deepseek-v4-flash
+      name: DeepSeek V4 Flash (SenseNova)
+      contextWindow: 1048576
+      maxTokens: 65536
+      # 上一代高效通用模型（0731 正式版），仍可用；默认为 V4.1 Flash，4.1 限流拥挤时切换。
+      reasoningEfforts:
+        off:
+        low: low
+        medium: medium
+        high: high
     - id: kimi-k3
       name: Kimi K3 (SenseNova)
       contextWindow: 1048576
