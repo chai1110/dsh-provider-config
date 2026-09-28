@@ -3,11 +3,11 @@
 
 > 为 [DeepSeek Harness (DSH)](https://github.com/deepseek-ai/deepseek-harness) 提供**经过实战验证**的 LLM 供应商配置模板与**限流重试机制**最佳实践。当前聚焦 SenseNova（商汤 Token Plan），结构可扩展到其他 OpenAI 兼容供应商。
 
-> **版本管理**：本仓库为纯配置模板，**不依赖特定 DSH 版本**（settings.yaml 配置通用于各版本，已核对到 `0.1.7-rc.2`，见下方「兼容性记录」）；git tag（如 `v0.1.2-rc.1`）仅用于标记模板自身的发布点。
+> **版本管理**：本仓库为纯配置模板，**不依赖特定 DSH 版本**（配置键通用于各版本，已核对到 **`0.1.7-rc.2`（官方 `latest`）**，见下方「兼容性记录」）；git tag（如 `v0.1.7-rc.2`）仅用于标记模板自身的发布点。
 
 ## 为什么需要这个项目
 
-DSH 通过 `~/.dsh/settings.yaml` 配置 LLM 供应商。其中最关键、也最容易被忽略的是 **`retryPolicy`（重试策略）**——它直接决定了：
+DSH 通过供应商配置来设置 LLM 供应商——**0.1.5 起该配置位于 profile 补丁层 `~/.dsh/profiles/web/cordis.patch.yml`**（更早版本为 `~/.dsh/settings.yaml`，升级时 dsh 会自动迁移，见下方「兼容性记录」）。其中最关键、也最容易被忽略的是 **`retryPolicy`（重试策略）**——它直接决定了：
 
 - 遇到限流（HTTP 429 / RATE_LIMIT）时，任务能否自动恢复
 - 重试多久后放弃，会不会无限卡死
@@ -19,7 +19,7 @@ DSH 通过 `~/.dsh/settings.yaml` 配置 LLM 供应商。其中最关键、也�
 
 | 路径 | 说明 |
 |---|---|
-| `config/sensenova.yaml` | SenseNova 供应商的**配置模板**（可复制进 `~/.dsh/settings.yaml`） |
+| `config/sensenova.yaml` | SenseNova 供应商的**配置模板**（复制进 `~/.dsh/profiles/web/cordis.patch.yml` 的 `llm-pi-ai:` 段；0.1.5 之前的版本为 `~/.dsh/settings.yaml`） |
 | `docs/retry-policy.md` | 重试机制详解：`normal` vs `always`、指数退避、抖动、次数上限的权衡 |
 | `docs/troubleshooting.md` | 限流排查指南：怎么判断是短暂限流还是持续性问题 |
 
@@ -27,7 +27,7 @@ DSH 通过 `~/.dsh/settings.yaml` 配置 LLM 供应商。其中最关键、也�
 
 1. 查看配置模板：`config/sensenova.yaml`
 2. 阅读重试机制：`docs/retry-policy.md`
-3. 按需复制到你的 `~/.dsh/settings.yaml`
+3. 按需复制到你的供应商配置：**0.1.5 及以上**写入 `~/.dsh/profiles/web/cordis.patch.yml` 的 `llm-pi-ai:` 段；**0.1.5 之前**写入 `~/.dsh/settings.yaml`
 4. 重启 DSH，享受遇到限流自动重试
 
 ## 配置模板
@@ -55,7 +55,8 @@ DSH 通过 `~/.dsh/settings.yaml` 配置 LLM 供应商。其中最关键、也�
 
 - `deepseek-v4-pro` 已从控制台下线 → 模板与示例配置移除（⚠️ API /v1/models 当时仍列出该 ID，但控制台计划不含即不可用）；
 - 新增 `deepseek-flash`（DeepSeek V4.1 Flash，ctx 1M / maxout 65536，tools+json+reasoning）；
-- 模板与示例配置同步更新；默认模型（2026-09-27 实测后调整）：**`deepseek-v4-flash`** —— 双模型对比实测：4.1 端点 3/3 全部 429 秒拒（新模型全网拥挤，RPM/TPM 双超），V4 Flash 3/3 成功约 2 秒；`deepseek-flash` 保留在清单作备选，高峰过后可用。`deepseek-v4-pro` 已下线移除；`deepseek-v4-flash` 保留为备选（4.1 限流拥挤时切换使用，实测 4.1 高峰期 429 频繁，重试策略会自动退避）。
+- 模板与示例配置同步更新；**默认模型**（2026-09-27 实测后调整）：**`deepseek-v4-flash`** —— 双模型对比实测：4.1 端点 3/3 全部 429 秒拒（新模型全网拥挤，RPM/TPM 双超），V4 Flash 3/3 成功约 2 秒。`deepseek-flash`（V4.1 Flash）保留在清单作备选，高峰过后可切换使用（实测 4.1 高峰期 429 频繁，重试策略会自动退避）。
+
 **0.1.7-rc.2 核对（2026-09-26）**
 
 - `dsh-llm-retry` 的 schema 仍含 `retryableCodes` / `initialDelayMs` / `maxDelayMs` / `jitterRatio` / `backoff`，`dsh-llm-pi-ai` 仍含 `baseURL` / `defaultContextWindow` / `defaultMaxTokens` / `reasoningEfforts` / `compat` / `displayName` / `apiKeyEnv` —— 全部有效。

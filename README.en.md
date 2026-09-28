@@ -3,11 +3,11 @@
 
 > Field-tested LLM **provider configuration templates** and **rate-limit retry best practices** for [DeepSeek Harness (DSH)](https://github.com/deepseek-ai/deepseek-harness). Currently focused on SenseNova (商汤 Token Plan), structured to extend to any OpenAI-compatible provider.
 
-> **Versioning**: this repo is pure config templates — **not tied to any specific DSH version** (settings.yaml works across versions; verified up to `0.1.7-rc.2`, see the compatibility record below); git tags (e.g. `v0.1.2-rc.1`) merely mark template release points.
+> **Versioning**: this repo is pure config templates — **not tied to any specific DSH version** (the config keys work across versions; verified up to **`0.1.7-rc.2`**, the official `latest`, see the compatibility record below); git tags (e.g. `v0.1.7-rc.2`) merely mark template release points.
 
 ## Why this project
 
-DSH configures LLM providers via `~/.dsh/settings.yaml`. The most critical — yet most overlooked — piece is **`retryPolicy`**. It decides:
+DSH configures LLM providers through its provider config — **as of 0.1.5 that lives in the profile patch layer `~/.dsh/profiles/web/cordis.patch.yml`** (earlier versions: `~/.dsh/settings.yaml`, which dsh auto-migrates on upgrade — see the compatibility record below). The most critical — yet most overlooked — piece is **`retryPolicy`**. It decides:
 
 - Whether a task auto-recovers when hitting rate limits (HTTP 429 / `RATE_LIMIT`)
 - How long retries continue before giving up, and whether it can hang forever
@@ -19,7 +19,7 @@ This project distills these settings into ready-to-use templates and explains wh
 
 | Path | Description |
 |---|---|
-| `config/sensenova.yaml` | Ready-to-use SenseNova provider template (copy into `~/.dsh/settings.yaml`) |
+| `config/sensenova.yaml` | Ready-to-use SenseNova provider template (copy into the `llm-pi-ai:` section of `~/.dsh/profiles/web/cordis.patch.yml`; on pre-0.1.5 versions use `~/.dsh/settings.yaml`) |
 | `docs/retry-policy.md` | Retry mechanics in depth: `normal` vs `always`, exponential backoff, jitter, retry-count tradeoffs |
 | `docs/troubleshooting.md` | Rate-limit troubleshooting: telling short bursts from persistent problems |
 
@@ -27,7 +27,7 @@ This project distills these settings into ready-to-use templates and explains wh
 
 1. Open the template: `config/sensenova.yaml`
 2. Read the retry mechanics: `docs/retry-policy.md`
-3. Copy what you need into your `~/.dsh/settings.yaml`
+3. Copy what you need into your provider config: on **0.1.5+** the `llm-pi-ai:` section of `~/.dsh/profiles/web/cordis.patch.yml`; on **pre-0.1.5** `~/.dsh/settings.yaml`
 4. Restart DSH, and enjoy automatic retry on rate limits
 
 ## Configuration template
@@ -54,7 +54,7 @@ Every config key comes from the official `dsh-llm` / `dsh-llm-pi-ai` schemas, so
 
 - `dsh-llm-retry` still ships `retryableCodes` / `initialDelayMs` / `maxDelayMs` / `jitterRatio` / `backoff`; `dsh-llm-pi-ai` still ships `baseURL` / `defaultContextWindow` / `defaultMaxTokens` / `reasoningEfforts` / `compat` / `displayName` / `apiKeyEnv` — every template key is valid.
 - **⚠️ Config location moved (since 0.1.5)**: the provider config migrates from `~/.dsh/settings.yaml` into the profile patch layer **`~/.dsh/profiles/web/cordis.patch.yml`** (the old file is renamed `settings.yaml.imported`). New users should put the template into the `llm-pi-ai:` section of that file.
-- **Model catalog (per the SenseNova Token Plan console)**: `deepseek-v4-pro` delisted → removed; **`deepseek-flash` (DeepSeek V4.1 Flash) added and set as default**; `deepseek-v4-flash` kept as a fallback (4.1 gets rate-limited at peak; the retry policy auto-backs-off).
+- **Model catalog (per the SenseNova Token Plan console)**: `deepseek-v4-pro` delisted → removed; `deepseek-flash` (DeepSeek V4.1 Flash) added; **`deepseek-v4-flash` is the default** (adjusted 2026-09-27 after head-to-head testing: the 4.1 endpoint was rejected 3/3 with instant 429s — the new model is congested, both RPM and TPM exceeded — while V4 Flash succeeded 3/3 in ~2s). `deepseek-flash` stays in the list as a fallback for when 4.1 traffic eases (4.1 gets rate-limited at peak; the retry policy auto-backs-off).
 
 **Item-by-item check against 0.1.5-rc.1 (2026-09-10)**
 
