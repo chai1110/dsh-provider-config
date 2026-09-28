@@ -5,6 +5,26 @@
 
 > **Versioning**: this repo is pure config templates — **not tied to any specific DSH version** (the config keys work across versions; verified up to **`0.1.7-rc.2`**, the official `latest`, see the compatibility record below); git tags (e.g. `v0.1.7-rc.2`) merely mark template release points.
 
+## 📌 Document status (which files are "latest")
+
+**Target version: DSH `0.1.7-rc.2` (official `latest`).**
+
+⚠️ **Not every document in this repo has been rewritten alongside the latest version.** The table below states
+each file's actual status — judge reliability by the "Status" column:
+
+| File | Status | Notes |
+|---|---|---|
+| `config/sensenova.yaml` | ✅ Up to date | Model catalog updated (removed the delisted `deepseek-v4-pro`, added `deepseek-flash`); default model is `deepseek-v4-flash` |
+| `README.md` / `README.en.md` | ✅ Up to date | Includes the `0.1.7-rc.2` compatibility check |
+| `docs/retry-policy.md` | ➖ Version-independent | Retry mechanics and source-code basis; references no config path or version number, so it **needs no update per version** |
+| `docs/troubleshooting.md` | ➖ Version-independent | Rate-limit troubleshooting steps; same as above |
+| `CONTRIBUTING.md` / `SECURITY.md` / `CODE_OF_CONDUCT.md` | ➖ Version-independent | Generic statements |
+
+> "Adapted" in this repo means **the config keys are still valid on the target DSH version** (checked key by key
+> against the official schemas) — it does **not** mean every document has been rewritten. This repo is
+> **not tied to any specific DSH version**: the template works across versions, and the only thing that
+> changes is the **config location** (moved to `cordis.patch.yml` as of 0.1.5 — see the compatibility record below).
+
 ## Why this project
 
 DSH configures LLM providers through its provider config — **as of 0.1.5 that lives in the profile patch layer `~/.dsh/profiles/web/cordis.patch.yml`** (earlier versions: `~/.dsh/settings.yaml`, which dsh auto-migrates on upgrade — see the compatibility record below). The most critical — yet most overlooked — piece is **`retryPolicy`**. It decides:
