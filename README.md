@@ -3,7 +3,7 @@
 
 > 为 [DeepSeek Harness (DSH)](https://github.com/deepseek-ai/deepseek-harness) 提供**经过实战验证**的 LLM 供应商配置模板与**限流重试机制**最佳实践。当前聚焦 SenseNova（商汤 Token Plan），结构可扩展到其他 OpenAI 兼容供应商。
 
-> **版本管理**：本仓库为纯配置模板，**不依赖特定 DSH 版本**（settings.yaml 配置通用于各版本，已核对到 `0.1.5-rc.1`，见下方「兼容性记录」）；git tag（如 `v0.1.2-rc.1`）仅用于标记模板自身的发布点。
+> **版本管理**：本仓库为纯配置模板，**不依赖特定 DSH 版本**（settings.yaml 配置通用于各版本，已核对到 `0.1.7-rc.2`，见下方「兼容性记录」）；git tag（如 `v0.1.2-rc.1`）仅用于标记模板自身的发布点。
 
 ## 为什么需要这个项目
 

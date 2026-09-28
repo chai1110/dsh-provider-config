@@ -3,7 +3,7 @@
 
 > Field-tested LLM **provider configuration templates** and **rate-limit retry best practices** for [DeepSeek Harness (DSH)](https://github.com/deepseek-ai/deepseek-harness). Currently focused on SenseNova (商汤 Token Plan), structured to extend to any OpenAI-compatible provider.
 
-> **Versioning**: this repo is pure config templates — **not tied to any specific DSH version** (settings.yaml works across versions; verified up to `0.1.5-rc.1`, see the compatibility record below); git tags (e.g. `v0.1.2-rc.1`) merely mark template release points.
+> **Versioning**: this repo is pure config templates — **not tied to any specific DSH version** (settings.yaml works across versions; verified up to `0.1.7-rc.2`, see the compatibility record below); git tags (e.g. `v0.1.2-rc.1`) merely mark template release points.
 
 ## Why this project
 
@@ -48,6 +48,13 @@ Every config key comes from the official `dsh-llm` / `dsh-llm-pi-ai` schemas, so
 |---|---|---|
 | `0.1.2-rc.1` | ✅ Template baseline | — |
 | **`0.1.5-rc.1`** | ✅ **No template change needed** | See below |
+| **`0.1.7-rc.2`** | ✅ **All keys valid; ⚠️ config location moved** | See below |
+
+**0.1.7-rc.2 check (2026-09-26) & model catalog update (2026-09-27)**
+
+- `dsh-llm-retry` still ships `retryableCodes` / `initialDelayMs` / `maxDelayMs` / `jitterRatio` / `backoff`; `dsh-llm-pi-ai` still ships `baseURL` / `defaultContextWindow` / `defaultMaxTokens` / `reasoningEfforts` / `compat` / `displayName` / `apiKeyEnv` — every template key is valid.
+- **⚠️ Config location moved (since 0.1.5)**: the provider config migrates from `~/.dsh/settings.yaml` into the profile patch layer **`~/.dsh/profiles/web/cordis.patch.yml`** (the old file is renamed `settings.yaml.imported`). New users should put the template into the `llm-pi-ai:` section of that file.
+- **Model catalog (per the SenseNova Token Plan console)**: `deepseek-v4-pro` delisted → removed; **`deepseek-flash` (DeepSeek V4.1 Flash) added and set as default**; `deepseek-v4-flash` kept as a fallback (4.1 gets rate-limited at peak; the retry policy auto-backs-off).
 
 **Item-by-item check against 0.1.5-rc.1 (2026-09-10)**
 
