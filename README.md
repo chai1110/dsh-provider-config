@@ -17,7 +17,7 @@
 | `README.md` / `README.en.md` | ✅ 已同步 | 含 `0.1.7-rc.2` 兼容性核对记录 |
 | `docs/retry-policy.md` | ➖ 版本无关 | 重试机制原理与源码依据，不涉及配置路径或版本号，**无需随版本更新** |
 | `docs/troubleshooting.md` | ➖ 版本无关 | 限流排查步骤，同上 |
-| `CONTRIBUTING.md` / `SECURITY.md` / `CODE_OF_CONDUCT.md` | ➖ 与版本无关 | 通用声明 |
+| `SECURITY.md` | ➖ 与版本无关 | 漏洞上报联系方式 |
 
 > 「适配」在本仓库指**配置键在目标 DSH 版本上仍然有效**（逐键核对官方 schema），
 > **不是**指每个文档都重写过。本仓库**不依赖特定 DSH 版本** —— 模板通用于各版本，
@@ -96,6 +96,14 @@ DSH 通过供应商配置来设置 LLM 供应商——**0.1.5 起该配置位于
 
 > 结论：**0.1.5-rc.1 上直接照抄本模板即可**，无需任何改写。
 > 需要更细的模型侧调优时可考虑 0.1.5 新增的可选 compat 键（如 `supportsMaxOutputTokens`）。
+
+## 🤝 贡献与反馈
+
+小项目，**没有单独的贡献指南** —— 直接开 Issue 或提 PR 就行。
+
+- 欢迎：新的供应商配置模板、重试/限流文档的改进、模板 bug 修复。
+- **唯一硬性要求**：提交里**绝不能出现真实 API key**，只用环境变量名（如 `SENSENOVA_API_KEY`）。
+- 安全问题请按 [`SECURITY.md`](SECURITY.md) 私下反馈，不要开公开 issue。
 
 ## License
 

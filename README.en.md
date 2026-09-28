@@ -18,7 +18,7 @@ each file's actual status — judge reliability by the "Status" column:
 | `README.md` / `README.en.md` | ✅ Up to date | Includes the `0.1.7-rc.2` compatibility check |
 | `docs/retry-policy.md` | ➖ Version-independent | Retry mechanics and source-code basis; references no config path or version number, so it **needs no update per version** |
 | `docs/troubleshooting.md` | ➖ Version-independent | Rate-limit troubleshooting steps; same as above |
-| `CONTRIBUTING.md` / `SECURITY.md` / `CODE_OF_CONDUCT.md` | ➖ Version-independent | Generic statements |
+| `SECURITY.md` | ➖ Version-independent | How to report vulnerabilities |
 
 > "Adapted" in this repo means **the config keys are still valid on the target DSH version** (checked key by key
 > against the official schemas) — it does **not** mean every document has been rewritten. This repo is
@@ -92,6 +92,14 @@ Every config key comes from the official `dsh-llm` / `dsh-llm-pi-ai` schemas, so
 
 > Conclusion: **just copy this template as-is on 0.1.5-rc.1** — no rewrite needed.
 > For finer model-side tuning, the new optional compat keys in 0.1.5 (e.g. `supportsMaxOutputTokens`) are worth a look.
+
+## 🤝 Contributing & Feedback
+
+Small project — **there is no separate contributing guide**. Just open an Issue or send a PR.
+
+- Welcome: new provider config templates, improvements to the retry/rate-limit docs, and template bug fixes.
+- **The one hard rule**: never include a real API key — use environment variable names only (e.g. `SENSENOVA_API_KEY`).
+- For security issues, follow [`SECURITY.md`](SECURITY.md) and report privately instead of opening a public issue.
 
 ## License
 
