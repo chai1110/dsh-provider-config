@@ -45,12 +45,16 @@ retryPolicy:
 retryPolicy:
   mode: normal
   maxRetries: 3
-  retryableCodes: [RATE_LIMIT, TIMEOUT, SERVER, TRANSPORT]
+  retryableCodes: [RATE_LIMIT, TIMEOUT, SERVER, TRANSPORT]   # 故意不含 QUOTA：配额类问题立即暴露，不重试
   backoff:
     initialDelayMs: 1000
     maxDelayMs: 10000
     jitterRatio: 0.3
 ```
+
+> 注意：上面**故意去掉了 `QUOTA`**，好让配额/余额类问题立刻报错而不是被重试掩盖。
+> 日常使用请用 [`config/sensenova.yaml`](../config/sensenova.yaml) 的完整 5 码清单
+> （`RATE_LIMIT` / `QUOTA` / `TIMEOUT` / `SERVER` / `TRANSPORT`）。
 
 ### 尽量避免 `mode: always`
 

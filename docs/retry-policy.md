@@ -20,12 +20,15 @@ if (/\b429\b|rate.?limit/i.test(message)) return "RATE_LIMIT";
 retryPolicy:
   mode: normal
   maxRetries: 15
-  retryableCodes: [RATE_LIMIT, TIMEOUT, SERVER, TRANSPORT]
+  retryableCodes: [RATE_LIMIT, QUOTA, TIMEOUT, SERVER, TRANSPORT]
   backoff: { initialDelayMs: 1000, maxDelayMs: 30000, jitterRatio: 0.3 }
 ```
 
-- **只对 `retryableCodes` 里的错误重试**（429 限流、超时、5xx、网络错误）
+- **只对 `retryableCodes` 里的错误重试**（429 限流、配额超限、超时、5xx、网络错误）
 - **有 `maxRetries` 上限**，重试耗尽后失败，向上层暴露错误
+
+> ⚠️ `QUOTA` 必须写进去 —— 原因见下方「实战：两种 429 的区别」。
+> 只写 `RATE_LIMIT` 会漏掉 SenseNova 的 `"Allocated quota exceeded"` 那一类。
 
 ### `mode: always`（不推荐）
 
