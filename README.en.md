@@ -70,11 +70,16 @@ Every config key comes from the official `dsh-llm` / `dsh-llm-pi-ai` schemas, so
 | **`0.1.5-rc.1`** | ✅ **No template change needed** | See below |
 | **`0.1.7-rc.2`** | ✅ **All keys valid; ⚠️ config location moved** | See below |
 
-**0.1.7-rc.2 check (2026-09-26) & model catalog update (2026-09-27)**
+**Model catalog update (2026-09-27, per the SenseNova Token Plan console)**
+
+- `deepseek-v4-pro` was delisted from the console → removed from the template and the example config (⚠️ the API `/v1/models` still listed that ID, but if the console plan does not include it, it is unusable);
+- `deepseek-flash` (DeepSeek V4.1 Flash, ctx 1M / maxout 65536, tools+json+reasoning) added;
+- Template and example config updated in sync; **default model** (adjusted 2026-09-27 after testing): **`deepseek-v4-flash`** — head-to-head test: the 4.1 endpoint was rejected 3/3 with instant 429s (the new model is congested, both RPM and TPM exceeded), while V4 Flash succeeded 3/3 in ~2s. `deepseek-flash` (V4.1 Flash) stays in the list as a fallback for when peak traffic eases (4.1 gets rate-limited at peak; the retry policy auto-backs-off).
+
+**0.1.7-rc.2 check (2026-09-26)**
 
 - `dsh-llm-retry` still ships `retryableCodes` / `initialDelayMs` / `maxDelayMs` / `jitterRatio` / `backoff`; `dsh-llm-pi-ai` still ships `baseURL` / `defaultContextWindow` / `defaultMaxTokens` / `reasoningEfforts` / `compat` / `displayName` / `apiKeyEnv` — every template key is valid.
 - **⚠️ Config location moved (since 0.1.5)**: the provider config migrates from `~/.dsh/settings.yaml` into the profile patch layer **`~/.dsh/profiles/web/cordis.patch.yml`** (the old file is renamed `settings.yaml.imported`). New users should put the template into the `llm-pi-ai:` section of that file.
-- **Model catalog (per the SenseNova Token Plan console)**: `deepseek-v4-pro` delisted → removed; `deepseek-flash` (DeepSeek V4.1 Flash) added; **`deepseek-v4-flash` is the default** (adjusted 2026-09-27 after head-to-head testing: the 4.1 endpoint was rejected 3/3 with instant 429s — the new model is congested, both RPM and TPM exceeded — while V4 Flash succeeded 3/3 in ~2s). `deepseek-flash` stays in the list as a fallback for when 4.1 traffic eases (4.1 gets rate-limited at peak; the retry policy auto-backs-off).
 
 **Item-by-item check against 0.1.5-rc.1 (2026-09-10)**
 
