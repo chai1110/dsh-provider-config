@@ -3,7 +3,7 @@
 
 > 为 [DeepSeek Harness (DSH)](https://github.com/deepseek-ai/deepseek-harness) 提供**经过实战验证**的 LLM 供应商配置模板。当前聚焦 **SenseNova（商汤 Token Plan）**，结构可扩展到其他 OpenAI 兼容供应商。
 
-> **版本管理**：本仓库为纯配置模板，**不依赖特定 DSH 版本**（配置键通用于各版本，已核对到 **`0.2.0-rc.1`（官方 `next`）**）；git tag（如 `v0.2.0-rc.1`）仅用于标记模板自身的发布点。
+> **版本管理**：本仓库为纯配置模板，**不依赖特定 DSH 版本**（配置键通用于各版本，已核对到 **`0.2.0-rc.2`（官方 `latest` 与 `next`）**）；git tag 仅用于标记模板自身的发布点。
 
 ## 这个仓库给你什么
 
@@ -159,7 +159,8 @@ node tools/dsh-profile-sync.mjs              # 同步写入
 | `0.1.2-rc.1` | ✅ 模板基准版本 | — |
 | **`0.1.5-rc.1`** | ✅ **模板无需改动** | 见下 |
 | **`0.1.7-rc.2`** | ✅ **配置键全部有效；⚠️ 配置位置迁移** | 见下 |
-| **`0.2.0-rc.1`** | ✅ **配置键全部有效；配置位置不变** | 见下 |
+| **`0.2.0-rc.2`** | ✅ **配置键全部有效；配置位置不变** | 见下 |
+| **`0.2.0-rc.1`** | ✅ 配置键全部有效 | 见下 |
 | **`0.2.0-rc.2`（桌面版）** | ✅ **同一套配置键可用；改配到 `profiles/desktop`** | 桌面版 Electron 实测 2026-09-29 |
 
 **模型目录更新（2026-09-27，以 SenseNova Token Plan 控制台为准）**
@@ -167,6 +168,14 @@ node tools/dsh-profile-sync.mjs              # 同步写入
 - `deepseek-v4-pro` 已从控制台下线 → 模板与示例配置移除（⚠️ API `/v1/models` 当时仍列出该 ID，但控制台计划不含即不可用）
 - 新增 `deepseek-flash`（DeepSeek V4.1 Flash，ctx 1M / maxout 65536，tools + json + reasoning）
 - **默认模型**（2026-09-27 实测后调整）：**`deepseek-v4-flash`** —— 双模型对比实测：4.1 端点 3/3 全部 429 秒拒（新模型全网拥挤，RPM/TPM 双超），V4 Flash 3/3 成功约 2 秒。`deepseek-flash`（V4.1 Flash）保留在清单作备选，高峰过后可切换
+
+**0.2.0-rc.2 核对（2026-09-29）**
+
+- `dsh-llm` 的 `lib/types/retry-policy.js` 与 0.2.0-rc.1 **逐字节相同**（SHA-256 一致）→ `retryPolicy.*` 全部有效
+- **pi-ai 0.85.1 → 0.87.1**（官方注「部分旧模型 ID 被移除，已保存的选择可能需重新选择」——那只影响**内置**模型目录）；
+  本模板的 sensenova provider 块为**自定义模型**（自备 ID/名称/上下文窗口），不受内置目录影响
+- 实测：`dsh --profile web --dump-config` 组装校验通过（sensenova 块正常出现），launchd 服务干净重启
+- ✅ 官方 `latest` 与 `next` 均已为 `0.2.0-rc.2`（2026-09-29 起），普通 `npm i -g @deepseek-ai/dsh` 即可
 
 **0.2.0-rc.1 核对（2026-09-28）**
 
