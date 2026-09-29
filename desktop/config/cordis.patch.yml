@@ -17,6 +17,7 @@
       # SenseNova（商汤 Token Plan）配置模板
       # 来源: https://github.com/chai1110/dsh-provider-config (config/sensenova.yaml)
       # key 通过环境变量 SENSENOVA_API_KEY 引用
+      # >>> dsh-provider-config:begin
       sensenova:
         displayName: SenseNova 商汤 Token Plan
         apiKeyEnv: SENSENOVA_API_KEY
@@ -25,43 +26,76 @@
         defaultContextWindow: 262144
         defaultMaxTokens: 65536
 
-        # ── reasoning_content / developer role 修复（provider 级）──────────────
-        # 不修的话 thinking 模型长对话会持续 400001、会话"卡死"（压缩路径同样中招）
+        # ── reasoning_content / developer role 修复（provider 级）──────────────────
+        # DSH 的 pi-ai 适配器把 SenseNova 网关（token.sensenova.cn）当作"标准 OpenAI
+        # 端点"，两项默认行为会在网关上的 thinking 模型（deepseek-v4-flash、glm-5.2）
+        # 上触发 400001 错误：
+        #
+        #   1. requiresReasoningContentOnAssistantMessages 默认 false —— pi-ai 仅对
+        #      provider=deepseek 或 baseURL 含 deepseek.com 自动补 reasoning_content，
+        #      SenseNova 两者都不满足。thinking 模式下，带 tool_calls 的 assistant
+        #      历史消息若缺 reasoning_content，网关返回：
+        #        400 {"code":"400001","message":"If thinking mode and tool_calls,
+        #             `reasoning_content` must be passed back to the API."}
+        #
+        #   2. supportsDeveloperRole 默认 true —— 模型被标记为 reasoning 后，pi-ai 会
+        #      把 system 消息改成 developer role（OpenAI reasoning 惯例），但 SenseNova
+        #      网关只接受 system/assistant/user/tool：
+        #        400 {"code":"400001","message":"...invalid value: `developer`..."}
+        #
+        # 这两项是网关级问题，与具体模型无关——凡网关上的 thinking 模型都会中招。
+        # 在 provider 级统一修正；对非 thinking 模型（如 sensenova-6.8-flash-lite）
+        # 无副作用，因其 model.reasoning=false 时上述逻辑均不触发。
+        # 对话变长触发自动压缩时，压缩的摘要请求也会重放历史，故该问题会让会话
+        # "卡死"（压缩与后续请求持续 400001）。本配置同时修复普通请求与压缩路径。
+        #
+        # ⚠️ 验证状态：
+        #   - developer role 错误（第 2 点）：已实测确认（400 复现 + 修正后不再报）。
+        #   - reasoning_content 错误（第 1 点）：源码逻辑链确证（pi-ai L924-928 兜底
+        #     逻辑即为此错误设计），但原始出错会话已被清除，纯 API 调用未能复现，
+        #     待长对话 + tool_call 实测最终确认。
         compat:
           requiresReasoningContentOnAssistantMessages: true
           supportsDeveloperRole: false
 
-        # ── 重试策略（详见 dsh-provider-config/docs/retry-policy.md）──────────
-        # QUOTA 不能省：SenseNova 两种形态的 429 归一化后走不到 code
+        # ── 重试策略（推荐配置，详见 docs/retry-policy.md）───────────────────────
+        # mode: normal —— 只对可重试错误重试，且有次数上限，避免无限卡死
         retryPolicy:
           mode: normal
-          maxRetries: 15
+          maxRetries: 15                    # 最多重试 15 次（约覆盖 8 分钟短暂限流）
           retryableCodes:
-            - RATE_LIMIT
-            - QUOTA
-            - TIMEOUT
-            - SERVER
-            - TRANSPORT
+            - RATE_LIMIT                    # HTTP 429 / rate limit
+            - QUOTA                         # 配额超限（Allocated quota exceeded / insufficient_quota）
+            - TIMEOUT                       # 请求超时
+            - SERVER                        # 服务器 5xx
+            - TRANSPORT                     # 网络层错误
           backoff:
-            initialDelayMs: 1000
-            maxDelayMs: 30000
-            jitterRatio: 0.3
+            initialDelayMs: 1000            # 首次等待 1s
+            maxDelayMs: 30000               # 退避上限 30s
+            jitterRatio: 0.3                # ±30% 抖动，避免惊群
 
-        # ── 模型清单（模板内置 5 个，按模板顺序）──────────────────────────────
+        # ── 可选模型清单 ─────────────────────────────────────────────────────────
         models:
           - id: sensenova-6.8-flash-lite
             name: SenseNova 6.8 Flash Lite (SenseNova)
-            description: 轻量多模态智能体模型（文本+图片输入），支持 tools/json_mode/reasoning，Flash-Lite
-              专属积分有返赠活动
+            # 轻量多模态智能体模型（文本+图片输入），支持 tools/json_mode/reasoning，
+            # Flash-Lite 专属积分有返赠活动。
+            #
+            # ⚠️ 这里原本写的是 `description: ...`，2026-09-29 改为注释：
+            #    dsh-llm-pi-ai 的模型 schema（modelFields）只认
+            #    name / contextWindow / maxTokens / input / reasoningEfforts / compat，
+            #    **没有 `description` 键** —— 写成配置项只会多一个无效键，不会显示在界面上。
+            #    想保留说明就写成注释（如本段）。
             contextWindow: 262144
             maxTokens: 65536
           - id: deepseek-flash
             name: DeepSeek V4.1 Flash (SenseNova)
             contextWindow: 1048576
             maxTokens: 65536
-            # 新一代高效通用模型（V4.1 Flash），1M 上下文。**备选**：实测高峰期 429 频繁
+            # 新一代高效通用模型（V4.1 Flash），1M 上下文，工具调用。**备选**：实测高峰期 429 频繁，
+            # 默认已切回 V4 Flash（见下）；高峰过后可切回本模型。同样声明 reasoningEfforts（原因见上）。
             reasoningEfforts:
-              off:
+              off: null
               low: low
               medium: medium
               high: high
@@ -69,9 +103,9 @@
             name: DeepSeek V4 Flash (SenseNova)
             contextWindow: 1048576
             maxTokens: 65536
-            # 上一代高效通用模型（0731 正式版），**本配置默认模型**（V4.1 高峰期 429 频繁时更稳）
+            # 上一代高效通用模型（0731 正式版），仍可用；**本模板默认模型**（V4.1 Flash 高峰期 429 频繁时更稳）。
             reasoningEfforts:
-              off:
+              off: null
               low: low
               medium: medium
               high: high
@@ -79,9 +113,9 @@
             name: Kimi K3 (SenseNova)
             contextWindow: 1048576
             maxTokens: 65536
-            # Kimi 新一代 thinking 模型，1M 上下文，工具调用
+            # Kimi 新一代 thinking 模型，1M 上下文，工具调用。同样声明 reasoningEfforts（原因见上）。
             reasoningEfforts:
-              off:
+              off: null
               low: low
               medium: medium
               high: high
@@ -89,12 +123,13 @@
             name: GLM-5.2 (SenseNova)
             contextWindow: 1048576
             maxTokens: 131072
-            # 同为 thinking 模型，同样需要声明 reasoningEfforts
+            # 同为 thinking 模型，同样需要声明 reasoningEfforts（原因见上）。
             reasoningEfforts:
-              off:
+              off: null
               low: low
               medium: medium
               high: high
+      # <<< dsh-provider-config:end
 
 - id: agent-default-model
   name: "@deepseek-ai/dsh-agent-default-model"
