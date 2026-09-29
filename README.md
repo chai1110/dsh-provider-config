@@ -79,6 +79,7 @@ DSH 的 pi-ai 适配器把 SenseNova 网关（`token.sensenova.cn`）当作**标
 | DSH 版本 | 供应商配置位置 |
 |---|---|
 | **0.1.5 及以上** | `~/.dsh/profiles/web/cordis.patch.yml` 的 `llm-pi-ai:` 段 |
+| **0.1.5 及以上（桌面版）** | `~/.dsh/profiles/desktop/cordis.patch.yml` 的 `llm-pi-ai:` 段 |
 | 0.1.5 之前 | `~/.dsh/settings.yaml` |
 
 > **Windows**：DSH 用 `os.homedir()` 拼 `.dsh`（见官方 `dsh-home-paths`：`join(homedir(), ".dsh")`），
@@ -88,6 +89,11 @@ DSH 的 pi-ai 适配器把 SenseNova 网关（`token.sensenova.cn`）当作**标
 
 > 升级时 DSH 会**自动迁移**旧配置，原文件改名 `settings.yaml.imported`。
 > 新装用户直接写 `cordis.patch.yml` 即可。
+
+> ⚠️ **网页版与桌面版是两个独立 profile**（`web` / `desktop`），配置文件互不影响：
+> 改网页版的 `cordis.patch.yml` 不会作用于桌面版，反之亦然 —— 两边都要单独配一份。
+> 桌面版（DeepSeek Harness Desktop）与 npm 版**共享 `~/.dsh` 根目录**（`.credentials.yaml` /
+> `settings.yaml.imported` / 会话数据），只有 profile 各自独立。本机桌面版配置建于 2026-09-29。
 
 ## 兼容性记录
 
@@ -99,6 +105,7 @@ DSH 的 pi-ai 适配器把 SenseNova 网关（`token.sensenova.cn`）当作**标
 | **`0.1.5-rc.1`** | ✅ **模板无需改动** | 见下 |
 | **`0.1.7-rc.2`** | ✅ **配置键全部有效；⚠️ 配置位置迁移** | 见下 |
 | **`0.2.0-rc.1`** | ✅ **配置键全部有效；配置位置不变** | 见下 |
+| **`0.2.0-rc.2`（桌面版）** | ✅ **同一套配置键可用；改配到 `profiles/desktop`** | 桌面版 Electron 实测 2026-09-29 |
 
 **模型目录更新（2026-09-27，以 SenseNova Token Plan 控制台为准）**
 

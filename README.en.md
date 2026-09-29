@@ -77,6 +77,7 @@ so two default behaviours trigger `400001` on the gateway's **thinking models**:
 | DSH version | Provider config location |
 |---|---|
 | **0.1.5 and later** | the `llm-pi-ai:` section of `~/.dsh/profiles/web/cordis.patch.yml` |
+| **0.1.5 and later (desktop app)** | the `llm-pi-ai:` section of `~/.dsh/profiles/desktop/cordis.patch.yml` |
 | Before 0.1.5 | `~/.dsh/settings.yaml` |
 
 > **Windows**: DSH builds the path with `os.homedir()` + `.dsh` (see the official `dsh-home-paths`: `join(homedir(), ".dsh")`), so `~` means `%USERPROFILE%` and the real path is
@@ -85,6 +86,12 @@ so two default behaviours trigger `400001` on the gateway's **thinking models**:
 
 > On upgrade DSH **auto-migrates** the old config and renames the original to `settings.yaml.imported`.
 > New users can just write to `cordis.patch.yml`.
+
+> ⚠️ **The web build and the desktop app are two separate profiles** (`web` / `desktop`):
+> editing one profile's `cordis.patch.yml` does not affect the other — each needs its own copy.
+> The desktop app (DeepSeek Harness Desktop) **shares the `~/.dsh` root** with the npm build
+> (`.credentials.yaml` / `settings.yaml.imported` / session data); only the profiles differ.
+> This machine's desktop profile was created on 2026-09-29.
 
 ## Compatibility record
 
@@ -96,6 +103,7 @@ Every config key comes from the official `dsh-llm` / `dsh-llm-pi-ai` schemas, so
 | **`0.1.5-rc.1`** | ✅ **No template change needed** | See below |
 | **`0.1.7-rc.2`** | ✅ **All keys valid; ⚠️ config location moved** | See below |
 | **`0.2.0-rc.1`** | ✅ **All keys valid; config location unchanged** | See below |
+| **`0.2.0-rc.2` (desktop app)** | ✅ **Same keys work; config moved to `profiles/desktop`** | Electron desktop app, verified 2026-09-29 |
 
 **Model catalog update (2026-09-27, per the SenseNova Token Plan console)**
 
