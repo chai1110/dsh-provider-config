@@ -1,0 +1,131 @@
+# Your patch layer for this dsh profile, applied after every bundle layer:
+# a top-level YAML array of loader patch entries (id-targeted config
+# overrides, disables, and insert lists; `!!js` expressions allowed).
+#
+# 2026-09-29 从 profiles/web/cordis.patch.yml 同步：SenseNova Token Plan provider、
+# 模型清单、重试策略、默认模型、主题、欢迎提示。登录态/凭据在 ~/.dsh/.credentials.yaml 共享。
+#
+- id: ui-settings-general
+  name: "@deepseek-ai/dsh-client-ui-settings-general"
+  config:
+    welcomeNoticeVersion: 2026-09-28.1
+
+- id: llm-pi-ai
+  name: "@deepseek-ai/dsh-llm-pi-ai"
+  config:
+    providers:
+      # SenseNova（商汤 Token Plan）配置模板
+      # 来源: https://github.com/chai1110/dsh-provider-config (config/sensenova.yaml)
+      # key 通过环境变量 SENSENOVA_API_KEY 引用
+      sensenova:
+        displayName: SenseNova 商汤 Token Plan
+        apiKeyEnv: SENSENOVA_API_KEY
+        api: openai-completions
+        baseURL: https://token.sensenova.cn/v1
+        defaultContextWindow: 262144
+        defaultMaxTokens: 65536
+
+        # ── reasoning_content / developer role 修复（provider 级）──────────────
+        # 不修的话 thinking 模型长对话会持续 400001、会话"卡死"（压缩路径同样中招）
+        compat:
+          requiresReasoningContentOnAssistantMessages: true
+          supportsDeveloperRole: false
+
+        # ── 重试策略（详见 dsh-provider-config/docs/retry-policy.md）──────────
+        # QUOTA 不能省：SenseNova 两种形态的 429 归一化后走不到 code
+        retryPolicy:
+          mode: normal
+          maxRetries: 15
+          retryableCodes:
+            - RATE_LIMIT
+            - QUOTA
+            - TIMEOUT
+            - SERVER
+            - TRANSPORT
+          backoff:
+            initialDelayMs: 1000
+            maxDelayMs: 30000
+            jitterRatio: 0.3
+
+        # ── 模型清单（模板内置 5 个，按模板顺序）──────────────────────────────
+        models:
+          - id: sensenova-6.8-flash-lite
+            name: SenseNova 6.8 Flash Lite (SenseNova)
+            description: 轻量多模态智能体模型（文本+图片输入），支持 tools/json_mode/reasoning，Flash-Lite
+              专属积分有返赠活动
+            contextWindow: 262144
+            maxTokens: 65536
+          - id: deepseek-flash
+            name: DeepSeek V4.1 Flash (SenseNova)
+            contextWindow: 1048576
+            maxTokens: 65536
+            # 新一代高效通用模型（V4.1 Flash），1M 上下文。**备选**：实测高峰期 429 频繁
+            reasoningEfforts:
+              off:
+              low: low
+              medium: medium
+              high: high
+          - id: deepseek-v4-flash
+            name: DeepSeek V4 Flash (SenseNova)
+            contextWindow: 1048576
+            maxTokens: 65536
+            # 上一代高效通用模型（0731 正式版），**本配置默认模型**（V4.1 高峰期 429 频繁时更稳）
+            reasoningEfforts:
+              off:
+              low: low
+              medium: medium
+              high: high
+          - id: kimi-k3
+            name: Kimi K3 (SenseNova)
+            contextWindow: 1048576
+            maxTokens: 65536
+            # Kimi 新一代 thinking 模型，1M 上下文，工具调用
+            reasoningEfforts:
+              off:
+              low: low
+              medium: medium
+              high: high
+          - id: glm-5.2
+            name: GLM-5.2 (SenseNova)
+            contextWindow: 1048576
+            maxTokens: 131072
+            # 同为 thinking 模型，同样需要声明 reasoningEfforts
+            reasoningEfforts:
+              off:
+              low: low
+              medium: medium
+              high: high
+
+- id: agent-default-model
+  name: "@deepseek-ai/dsh-agent-default-model"
+  config:
+    provider: sensenova
+    model: deepseek-v4-flash
+
+- id: ui-theme
+  name: "@deepseek-ai/dsh-client-ui-theme"
+  config:
+    preference: dark
+    fontSize: 14
+
+- id: ui-settings-account
+  name: "@deepseek-ai/dsh-client-ui-settings-account"
+  config:
+    version: 1
+    step: done
+    purpose: both
+    process: detailed
+    completion: completed
+    usage: detailed
+    developerTools: true
+
+- id: ui-chat
+  name: "@deepseek-ai/dsh-client-ui-chat"
+  config:
+    transcriptView: detailed
+    performanceUsage: detailed
+
+- id: ui-settings
+  name: "@deepseek-ai/dsh-client-ui-settings"
+  config:
+    enabled: true

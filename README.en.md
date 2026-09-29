@@ -93,6 +93,11 @@ so two default behaviours trigger `400001` on the gateway's **thinking models**:
 > (`.credentials.yaml` / `settings.yaml.imported` / session data); only the profiles differ.
 > This machine's desktop profile was created on 2026-09-29.
 
+> 📁 **Desktop topic**: full guide + live config snapshot in [`desktop/`](desktop/README.en.md)
+> (`desktop/config/cordis.patch.yml`, 2026-09-29, 7 sections / 4600 bytes). The config path is identical
+> on Windows and macOS; the platform-specific part is installing the patches into the asar — see
+> [`dsh-custom-patches/desktop/`](https://github.com/chai1110/dsh-custom-patches/blob/main/desktop/README.md).
+
 ## Compatibility record
 
 Every config key comes from the official `dsh-llm` / `dsh-llm-pi-ai` schemas, so only those two need checking.

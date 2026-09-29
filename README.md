@@ -95,6 +95,10 @@ DSH 的 pi-ai 适配器把 SenseNova 网关（`token.sensenova.cn`）当作**标
 > 桌面版（DeepSeek Harness Desktop）与 npm 版**共享 `~/.dsh` 根目录**（`.credentials.yaml` /
 > `settings.yaml.imported` / 会话数据），只有 profile 各自独立。本机桌面版配置建于 2026-09-29。
 
+> 📁 **桌面版专题**：完整教程 + 已生效配置快照见 [`desktop/`](desktop/README.md)
+> （`desktop/config/cordis.patch.yml`，2026-09-29，7 段 / 4600 字节；配置侧 Windows 与 macOS 路径相同，
+> 有平台差异的是 asar 补丁安装，见 [`dsh-custom-patches/desktop/`](https://github.com/chai1110/dsh-custom-patches/blob/main/desktop/README.md)）。
+
 ## 兼容性记录
 
 配置键全部来自官方 `dsh-llm` / `dsh-llm-pi-ai` 的 schema，因此只需核对这两处。
