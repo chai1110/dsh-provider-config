@@ -79,6 +79,10 @@ so two default behaviours trigger `400001` on the gateway's **thinking models**:
 | **0.1.5 and later** | the `llm-pi-ai:` section of `~/.dsh/profiles/web/cordis.patch.yml` |
 | Before 0.1.5 | `~/.dsh/settings.yaml` |
 
+> **Windows**: DSH builds the path with `os.homedir()` + `.dsh` (see the official `dsh-home-paths`: `join(homedir(), ".dsh")`), so `~` means `%USERPROFILE%` and the real path is
+> `%USERPROFILE%\.dsh\profiles\web\cordis.patch.yml` (usually `C:\Users\<you>\.dsh\...`).
+> Both `~/` and `~\` forms of `~` expansion are supported in config values.
+
 > On upgrade DSH **auto-migrates** the old config and renames the original to `settings.yaml.imported`.
 > New users can just write to `cordis.patch.yml`.
 

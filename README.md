@@ -81,6 +81,11 @@ DSH 的 pi-ai 适配器把 SenseNova 网关（`token.sensenova.cn`）当作**标
 | **0.1.5 及以上** | `~/.dsh/profiles/web/cordis.patch.yml` 的 `llm-pi-ai:` 段 |
 | 0.1.5 之前 | `~/.dsh/settings.yaml` |
 
+> **Windows**：DSH 用 `os.homedir()` 拼 `.dsh`（见官方 `dsh-home-paths`：`join(homedir(), ".dsh")`），
+> 所以 `~` 就是 `%USERPROFILE%`，即实际路径为
+> `%USERPROFILE%\.dsh\profiles\web\cordis.patch.yml`（通常是 `C:\Users\<你>\.dsh\...`）。
+> 官方同时支持 `~/` 与 `~\` 两种 `~` 展开写法，配置里两种都能用。
+
 > 升级时 DSH 会**自动迁移**旧配置，原文件改名 `settings.yaml.imported`。
 > 新装用户直接写 `cordis.patch.yml` 即可。
 
