@@ -1,12 +1,17 @@
 # SenseNova（商汤 Token Plan）配置模板
 #
 # 复制本文件的内容到 DSH 的供应商配置（llm-pi-ai.providers 下）。
-#   - DSH 0.1.5 及以后：~/.dsh/profiles/web/cordis.patch.yml 的 llm-pi-ai: 段
-#     （升级时 dsh 会把旧的 ~/.dsh/settings.yaml 自动迁移过来，原文件改名 settings.yaml.imported）
-#   - 桌面版（DeepSeek Harness Desktop）：~/.dsh/profiles/desktop/cordis.patch.yml（独立 profile，需单独配一份）
-#   - DSH 0.1.5 之前：~/.dsh/settings.yaml
 #
-# key 通过环境变量 SENSENOVA_API_KEY 引用，启动 DSH 前先 export：
+# 每个「面」有各自的 cordis.patch.yml，要**逐面配置**（互不继承）：
+#   - 浏览器 / dsh web ：~/.dsh/profiles/web/cordis.patch.yml 的 llm-pi-ai: 段
+#   - 桌面版 Harness.app：~/.dsh/profiles/desktop/cordis.patch.yml
+#     （桌面 profile 由 Electron 应用独占管理，dsh --profile desktop 会被拒绝，
+#       只能直接编辑文件 + 重启应用生效）
+#   - DSH 0.1.5 之前：~/.dsh/settings.yaml
+#     （升级时 dsh 会把旧配置自动迁移过来，原文件改名 settings.yaml.imported）
+#
+# key 存在全局 ~/.dsh/.credentials.yaml 的 refs 里，各面共用；
+# 若该 ref 不存在，则退化为读环境变量，启动 DSH 前先 export：
 #   export SENSENOVA_API_KEY=<你的key>
 
 sensenova:
@@ -69,7 +74,14 @@ sensenova:
   models:
     - id: sensenova-6.8-flash-lite
       name: SenseNova 6.8 Flash Lite (SenseNova)
-      description: 轻量多模态智能体模型（文本+图片输入），支持 tools/json_mode/reasoning，Flash-Lite 专属积分有返赠活动
+      # 轻量多模态智能体模型（文本+图片输入），支持 tools/json_mode/reasoning，
+      # Flash-Lite 专属积分有返赠活动。
+      #
+      # ⚠️ 这里原本写的是 `description: ...`，2026-09-29 改为注释：
+      #    dsh-llm-pi-ai 的模型 schema（modelFields）只认
+      #    name / contextWindow / maxTokens / input / reasoningEfforts / compat，
+      #    **没有 `description` 键** —— 写成配置项只会多一个无效键，不会显示在界面上。
+      #    想保留说明就写成注释（如本段）。
       contextWindow: 262144
       maxTokens: 65536
     - id: deepseek-flash
@@ -79,7 +91,7 @@ sensenova:
       # 新一代高效通用模型（V4.1 Flash），1M 上下文，工具调用。**备选**：实测高峰期 429 频繁，
       # 默认已切回 V4 Flash（见下）；高峰过后可切回本模型。同样声明 reasoningEfforts（原因见上）。
       reasoningEfforts:
-        off:
+        off: null
         low: low
         medium: medium
         high: high
@@ -89,7 +101,7 @@ sensenova:
       maxTokens: 65536
       # 上一代高效通用模型（0731 正式版），仍可用；**本模板默认模型**（V4.1 Flash 高峰期 429 频繁时更稳）。
       reasoningEfforts:
-        off:
+        off: null
         low: low
         medium: medium
         high: high
@@ -99,7 +111,7 @@ sensenova:
       maxTokens: 65536
       # Kimi 新一代 thinking 模型，1M 上下文，工具调用。同样声明 reasoningEfforts（原因见上）。
       reasoningEfforts:
-        off:
+        off: null
         low: low
         medium: medium
         high: high
@@ -109,7 +121,7 @@ sensenova:
       maxTokens: 131072
       # 同为 thinking 模型，同样需要声明 reasoningEfforts（原因见上）。
       reasoningEfforts:
-        off:
+        off: null
         low: low
         medium: medium
         high: high

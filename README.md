@@ -76,15 +76,26 @@ DSH 的 pi-ai 适配器把 SenseNova 网关（`token.sensenova.cn`）当作**标
 
 ## 配置文件放哪
 
-| DSH 版本 | 供应商配置位置 |
+DSH 每个「面」各有**一份自己的** `cordis.patch.yml`，供应商配置要**逐面配置** —— 它们**互不继承**：
+
+| 面 | 供应商配置位置 |
 |---|---|
-| **0.1.5 及以上** | `~/.dsh/profiles/web/cordis.patch.yml` 的 `llm-pi-ai:` 段 |
-| **0.1.5 及以上（桌面版）** | `~/.dsh/profiles/desktop/cordis.patch.yml` 的 `llm-pi-ai:` 段 |
-| 0.1.5 之前 | `~/.dsh/settings.yaml` |
+| 浏览器 / `dsh web` | `~/.dsh/profiles/web/cordis.patch.yml` 的 `llm-pi-ai:` 段 |
+| 桌面版 `DeepSeek Harness.app` | `~/.dsh/profiles/desktop/cordis.patch.yml` |
+| VS Code Lite（自起实例） | 走 `web` profile，同上第一条 |
+| 0.1.5 之前的老版本 | `~/.dsh/settings.yaml` |
+
+> **桌面版两个要点**：
+> 1. 桌面版 profile 由 Electron 应用**独占管理** —— `dsh --profile desktop` 会被直接拒绝
+>    （`profile "desktop" is managed exclusively by the Electron application`），
+>    所以只能**直接编辑文件**，改完**重启应用**生效。
+> 2. API key 存在**全局** `~/.dsh/.credentials.yaml` 的 `refs` 里，各面共用，
+>    **不需要在桌面版重新配 key**。
 
 > **Windows**：DSH 用 `os.homedir()` 拼 `.dsh`（见官方 `dsh-home-paths`：`join(homedir(), ".dsh")`），
 > 所以 `~` 就是 `%USERPROFILE%`，即实际路径为
-> `%USERPROFILE%\.dsh\profiles\web\cordis.patch.yml`（通常是 `C:\Users\<你>\.dsh\...`）。
+> `%USERPROFILE%\.dsh\profiles\web\cordis.patch.yml`（通常是 `C:\Users\<你>\.dsh\...`）；
+> 桌面版同理为 `%USERPROFILE%\.dsh\profiles\desktop\cordis.patch.yml`。
 > 官方同时支持 `~/` 与 `~\` 两种 `~` 展开写法，配置里两种都能用。
 
 > 升级时 DSH 会**自动迁移**旧配置，原文件改名 `settings.yaml.imported`。
@@ -98,6 +109,46 @@ DSH 的 pi-ai 适配器把 SenseNova 网关（`token.sensenova.cn`）当作**标
 > 📁 **桌面版专题**：完整教程 + 已生效配置快照见 [`desktop/`](desktop/README.md)
 > （`desktop/config/cordis.patch.yml`，2026-09-29，7 段 / 4600 字节；配置侧 Windows 与 macOS 路径相同，
 > 有平台差异的是 asar 补丁安装，见 [`dsh-custom-patches/desktop/`](https://github.com/chai1110/dsh-custom-patches/blob/main/desktop/README.md)）。
+
+### 多面同步：别再手工复制（推荐）
+
+**各面互不继承** ⇒ 同一份供应商配置要在多处各写一遍 ⇒ 迟早**静默漂移**。
+这不是假设：2026-09-29 实测就发现本仓库模板里 `models[].description` 多了一条、
+而 web / desktop 两个 profile 都没有；`off:` 的写法也各不相同。**这类漂移不会报错。**
+
+所以本仓库带了一个同步工具，把 `config/sensenova.yaml` 定为**唯一数据源**：
+
+```bash
+node tools/dsh-profile-sync.mjs --list       # 看哪些面已纳入同步
+node tools/dsh-profile-sync.mjs --check      # 只检测漂移（退出码 1 = 有漂移，可用于巡检）
+node tools/dsh-profile-sync.mjs --dry-run    # 预览将写入的内容
+node tools/dsh-profile-sync.mjs              # 同步写入
+```
+
+它只替换 profile 里**一对哨兵注释之间**的内容，其余部分（各面自己的
+`agent-default-model` / `ui-chat` 等）**一个字符都不动**：
+
+```yaml
+    providers:
+      # >>> dsh-provider-config:begin —— 由 tools/dsh-profile-sync.mjs 生成，勿手改
+      sensenova:
+        displayName: ...
+      # <<< dsh-provider-config:end
+```
+
+**设计要点**：
+
+- **不用 YAML 解析器**：模板正文整体按哨兵行的缩进重排即可 —— 零依赖、不会因为
+  解析器版本差异而改坏配置。
+- 模板**顶部整段注释**是模板自身说明，不写进 profile；模板**内部注释**会一并带过去，
+  让 profile 自解释（为什么设 `requiresReasoningContentOnAssistantMessages` 等）。
+- 实测：同步后 web 的 80 行内容、desktop 的 93 行内容**逐行完全一致** ——
+  即「只增加了注释，没有改动任何配置值」；再用 DSH 自带的 `yaml` 库解析三份
+  （模板 / web / desktop），provider 对象**深相等**。
+- 未加哨兵的面（如 `headless`，配置为 `[]`）**不会被同步**，只会提示。
+
+> 新增一个面要纳入同步：在其 `llm-pi-ai` 的 `providers:` 下加那两行哨兵即可，
+> 然后跑一次 `--check` 确认。
 
 ## 兼容性记录
 
@@ -148,8 +199,9 @@ DSH 的 pi-ai 适配器把 SenseNova 网关（`token.sensenova.cn`）当作**标
 
 | 文件 | 状态 | 说明 |
 |---|---|---|
-| `config/sensenova.yaml` | ✅ 已同步 | 模型目录已更新（移除下线的 `deepseek-v4-pro`、新增 `deepseek-flash`）；默认模型 `deepseek-v4-flash` |
-| `README.md` / `README.en.md` | ✅ 已同步 | 含 `0.2.0-rc.1` 兼容性核对记录 |
+| `config/sensenova.yaml` | ✅ 已同步 | **唯一数据源**。模型目录已更新（移除下线的 `deepseek-v4-pro`、新增 `deepseek-flash`）；默认模型 `deepseek-v4-flash`。2026-09-29：惰性字段 `description` 改为注释、`off:` 统一为 `off: null` |
+| `tools/dsh-profile-sync.mjs` | ✅ 已实测 | **多面同步工具**（零依赖）：把上面的模板渲染进各 profile 的哨兵区间；`--check` 检测漂移、`--dry-run` 预览。实测同步后两个 profile 的内容行逐行未变、provider 对象深相等 |
+| `README.md` / `README.en.md` | ✅ 已同步 | 含 `0.2.0-rc.1` 兼容性核对记录 + 多面同步说明 |
 | `docs/retry-policy.md` | ➖ 版本无关 | 重试机制原理与源码依据，不涉及配置路径或版本号，**无需随版本更新** |
 | `docs/troubleshooting.md` | ➖ 版本无关 | 限流排查步骤，同上 |
 | `SECURITY.md` | ➖ 与版本无关 | 漏洞上报联系方式 |
