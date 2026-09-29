@@ -3,7 +3,7 @@
 
 > 为 [DeepSeek Harness (DSH)](https://github.com/deepseek-ai/deepseek-harness) 提供**经过实战验证**的 LLM 供应商配置模板。当前聚焦 **SenseNova（商汤 Token Plan）**，结构可扩展到其他 OpenAI 兼容供应商。
 
-> **版本管理**：本仓库为纯配置模板，**不依赖特定 DSH 版本**（配置键通用于各版本，已核对到 **`0.1.7-rc.2`（官方 `latest`）**）；git tag（如 `v0.1.7-rc.2`）仅用于标记模板自身的发布点。
+> **版本管理**：本仓库为纯配置模板，**不依赖特定 DSH 版本**（配置键通用于各版本，已核对到 **`0.2.0-rc.1`（官方 `next`）**）；git tag（如 `v0.2.0-rc.1`）仅用于标记模板自身的发布点。
 
 ## 这个仓库给你什么
 
@@ -93,12 +93,21 @@ DSH 的 pi-ai 适配器把 SenseNova 网关（`token.sensenova.cn`）当作**标
 | `0.1.2-rc.1` | ✅ 模板基准版本 | — |
 | **`0.1.5-rc.1`** | ✅ **模板无需改动** | 见下 |
 | **`0.1.7-rc.2`** | ✅ **配置键全部有效；⚠️ 配置位置迁移** | 见下 |
+| **`0.2.0-rc.1`** | ✅ **配置键全部有效；配置位置不变** | 见下 |
 
 **模型目录更新（2026-09-27，以 SenseNova Token Plan 控制台为准）**
 
 - `deepseek-v4-pro` 已从控制台下线 → 模板与示例配置移除（⚠️ API `/v1/models` 当时仍列出该 ID，但控制台计划不含即不可用）
 - 新增 `deepseek-flash`（DeepSeek V4.1 Flash，ctx 1M / maxout 65536，tools + json + reasoning）
 - **默认模型**（2026-09-27 实测后调整）：**`deepseek-v4-flash`** —— 双模型对比实测：4.1 端点 3/3 全部 429 秒拒（新模型全网拥挤，RPM/TPM 双超），V4 Flash 3/3 成功约 2 秒。`deepseek-flash`（V4.1 Flash）保留在清单作备选，高峰过后可切换
+
+**0.2.0-rc.1 核对（2026-09-28）**
+
+- `dsh-llm` 的 `lib/types/retry-policy.{js,d.ts}` 与 0.1.7-rc.2 **逐字节相同**（SHA-256 一致）→ `retryPolicy.mode` / `maxRetries` / `retryableCodes` / `backoff.{initialDelayMs,maxDelayMs,jitterRatio}` 全部有效
+- `dsh-llm-pi-ai` 的 `compat` 键 **26 → 26，零增删**；本模板用到的 `requiresReasoningContentOnAssistantMessages` 与 `supportsDeveloperRole` 均在其中
+- 模板用到的 provider / model 级键（`baseURL` / `apiKeyEnv` / `displayName` / `api` / `defaultContextWindow` / `defaultMaxTokens` / `reasoningEfforts` / `models` / `compat`）**全部仍在**
+- **✅ 配置位置不变**：仍在 `~/.dsh/profiles/web/cordis.patch.yml`（官方 `dsh-llm-pi-ai` README 原文：该文件「仍然是决定路由服务内容的唯一事实」）
+- ⚠️ 新装用户注意：`0.2.0-rc.1` 在官方 **`next`** 频道，`latest` 仍是 `0.1.7-rc.2`；本模板对两者都适用，无需改动
 
 **0.1.7-rc.2 核对（2026-09-26）**
 
@@ -117,14 +126,14 @@ DSH 的 pi-ai 适配器把 SenseNova 网关（`token.sensenova.cn`）当作**标
 
 ## 📌 文档状态（哪些是最新的）
 
-**目标版本：DSH `0.1.7-rc.2`（官方 `latest`）。**
+**目标版本：DSH `0.2.0-rc.1`（官方 `next`）。**
 
 ⚠️ 本仓库**并非每个文档都随最新版同步重写过**。下表如实说明，请按「状态」列判断可信度：
 
 | 文件 | 状态 | 说明 |
 |---|---|---|
 | `config/sensenova.yaml` | ✅ 已同步 | 模型目录已更新（移除下线的 `deepseek-v4-pro`、新增 `deepseek-flash`）；默认模型 `deepseek-v4-flash` |
-| `README.md` / `README.en.md` | ✅ 已同步 | 含 `0.1.7-rc.2` 兼容性核对记录 |
+| `README.md` / `README.en.md` | ✅ 已同步 | 含 `0.2.0-rc.1` 兼容性核对记录 |
 | `docs/retry-policy.md` | ➖ 版本无关 | 重试机制原理与源码依据，不涉及配置路径或版本号，**无需随版本更新** |
 | `docs/troubleshooting.md` | ➖ 版本无关 | 限流排查步骤，同上 |
 | `SECURITY.md` | ➖ 与版本无关 | 漏洞上报联系方式 |

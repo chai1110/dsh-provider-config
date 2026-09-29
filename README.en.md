@@ -3,7 +3,7 @@
 
 > Field-tested LLM **provider configuration templates** for [DeepSeek Harness (DSH)](https://github.com/deepseek-ai/deepseek-harness). Currently focused on **SenseNova (商汤 Token Plan)**, structured to extend to any OpenAI-compatible provider.
 
-> **Versioning**: this repo is pure config templates — **not tied to any specific DSH version** (the config keys work across versions; verified up to **`0.1.7-rc.2`**, the official `latest`); git tags (e.g. `v0.1.7-rc.2`) merely mark template release points.
+> **Versioning**: this repo is pure config templates — **not tied to any specific DSH version** (the config keys work across versions; verified up to **`0.2.0-rc.1`**, the official `next`); git tags (e.g. `v0.2.0-rc.1`) merely mark template release points.
 
 ## What you get
 
@@ -91,12 +91,21 @@ Every config key comes from the official `dsh-llm` / `dsh-llm-pi-ai` schemas, so
 | `0.1.2-rc.1` | ✅ Template baseline | — |
 | **`0.1.5-rc.1`** | ✅ **No template change needed** | See below |
 | **`0.1.7-rc.2`** | ✅ **All keys valid; ⚠️ config location moved** | See below |
+| **`0.2.0-rc.1`** | ✅ **All keys valid; config location unchanged** | See below |
 
 **Model catalog update (2026-09-27, per the SenseNova Token Plan console)**
 
 - `deepseek-v4-pro` was delisted from the console → removed from the template and the example config (⚠️ the API `/v1/models` still listed that ID, but if the console plan does not include it, it is unusable)
 - `deepseek-flash` added (DeepSeek V4.1 Flash, ctx 1M / maxout 65536, tools + json + reasoning)
 - **Default model** (adjusted 2026-09-27 after testing): **`deepseek-v4-flash`** — head-to-head test: the 4.1 endpoint was rejected 3/3 with instant 429s (the new model is congested, both RPM and TPM exceeded), while V4 Flash succeeded 3/3 in ~2s. `deepseek-flash` (V4.1 Flash) stays in the list as a fallback for when peak traffic eases
+
+**0.2.0-rc.1 check (2026-09-28)**
+
+- `dsh-llm`'s `lib/types/retry-policy.{js,d.ts}` are **byte-identical** to 0.1.7-rc.2 (matching SHA-256) → `retryPolicy.mode` / `maxRetries` / `retryableCodes` / `backoff.{initialDelayMs,maxDelayMs,jitterRatio}` all remain valid
+- `dsh-llm-pi-ai`'s `compat` keys went **26 → 26, zero additions or removals**; both keys this template uses (`requiresReasoningContentOnAssistantMessages`, `supportsDeveloperRole`) are among them
+- Every provider / model-level key the template uses (`baseURL` / `apiKeyEnv` / `displayName` / `api` / `defaultContextWindow` / `defaultMaxTokens` / `reasoningEfforts` / `models` / `compat`) **is still present**
+- **✅ Config location unchanged**: still `~/.dsh/profiles/web/cordis.patch.yml` (the official `dsh-llm-pi-ai` README states it "remains the single source of truth for what a route serves")
+- ⚠️ New users note: `0.2.0-rc.1` is on the official **`next`** channel; `latest` is still `0.1.7-rc.2`. This template works on both — no change needed
 
 **0.1.7-rc.2 check (2026-09-26)**
 
@@ -115,7 +124,7 @@ Every config key comes from the official `dsh-llm` / `dsh-llm-pi-ai` schemas, so
 
 ## 📌 Document status (which files are "latest")
 
-**Target version: DSH `0.1.7-rc.2` (official `latest`).**
+**Target version: DSH `0.2.0-rc.1` (official `next`).**
 
 ⚠️ **Not every document in this repo has been rewritten alongside the latest version.** The table below states
 each file's actual status — judge reliability by the "Status" column:
@@ -123,7 +132,7 @@ each file's actual status — judge reliability by the "Status" column:
 | File | Status | Notes |
 |---|---|---|
 | `config/sensenova.yaml` | ✅ Up to date | Model catalog updated (removed the delisted `deepseek-v4-pro`, added `deepseek-flash`); default model is `deepseek-v4-flash` |
-| `README.md` / `README.en.md` | ✅ Up to date | Includes the `0.1.7-rc.2` compatibility check |
+| `README.md` / `README.en.md` | ✅ Up to date | Includes the `0.2.0-rc.1` compatibility check |
 | `docs/retry-policy.md` | ➖ Version-independent | Retry mechanics and source-code basis; references no config path or version number, so it **needs no update per version** |
 | `docs/troubleshooting.md` | ➖ Version-independent | Rate-limit troubleshooting steps; same as above |
 | `SECURITY.md` | ➖ Version-independent | How to report vulnerabilities |
