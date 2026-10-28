@@ -3,7 +3,7 @@
 
 > Field-tested LLM **provider configuration templates** for [DeepSeek Harness (DSH)](https://github.com/deepseek-ai/deepseek-harness). Currently focused on **SenseNova (商汤 Token Plan)**, structured to extend to any OpenAI-compatible provider.
 
-> **Versioning**: this repo is pure config templates — **not tied to any specific DSH version** (the config keys work across versions; verified up to **`0.2.0-rc.1`**, the official `next`); git tags (e.g. `v0.2.0-rc.1`) merely mark template release points.
+> **Versioning**: this repo is pure config templates — **not tied to any specific DSH version** (the config keys work across versions; verified up to **`0.2.1-rc.3`**, the official `next`; `latest` is still `0.2.0-rc.2`); git tags (e.g. `v0.2.0-rc.1`) merely mark template release points.
 
 ## What you get
 
@@ -156,6 +156,7 @@ Every config key comes from the official `dsh-llm` / `dsh-llm-pi-ai` schemas, so
 | DSH version | Result | Basis |
 |---|---|---|
 | `0.1.2-rc.1` | ✅ Template baseline | — |
+| **`0.2.1-rc.3` (desktop app)** | ✅ **Zero template change; all keys and location unchanged** | ⭐ Latest check, 2026-10-28 (see below) |
 | **`0.1.5-rc.1`** | ✅ **No template change needed** | See below |
 | **`0.1.7-rc.2`** | ✅ **All keys valid; ⚠️ config location moved** | See below |
 | **`0.2.0-rc.1`** | ✅ **All keys valid; config location unchanged** | See below |
@@ -166,6 +167,15 @@ Every config key comes from the official `dsh-llm` / `dsh-llm-pi-ai` schemas, so
 - `deepseek-v4-pro` was delisted from the console → removed from the template and the example config (⚠️ the API `/v1/models` still listed that ID, but if the console plan does not include it, it is unusable)
 - `deepseek-flash` added (DeepSeek V4.1 Flash, ctx 1M / maxout 65536, tools + json + reasoning)
 - **Default model** (adjusted 2026-09-27 after testing): **`deepseek-v4-flash`** — head-to-head test: the 4.1 endpoint was rejected 3/3 with instant 429s (the new model is congested, both RPM and TPM exceeded), while V4 Flash succeeded 3/3 in ~2s. `deepseek-flash` (V4.1 Flash) stays in the list as a fallback for when peak traffic eases
+
+**0.2.1-rc.3 check (2026-10-28) — zero template change**
+
+- **Conclusion: no template change needed on this version.** Config keys, field types, and config location all still match.
+- `dsh-llm` still exports `RetryPolicySchema`: `backoffSchema` = `initialDelayMs` / `maxDelayMs` / `jitterRatio`, `normalPolicySchema` = `mode` / `maxRetries` / `retryableCodes` — matching the template's `retryPolicy` block item by item.
+- The `dsh-llm-pi-ai` provider profile schema still carries `displayName` / `apiKeyEnv` / `baseURL` / `api: openai-completions` / `defaultContextWindow` / `defaultMaxTokens` / `compat.{requiresReasoningContentOnAssistantMessages,supportsDeveloperRole}` / `reasoningEfforts` / `models`.
+- ⚠️ **Neither of the two guards added in the 0.2.1 line applies here**: `rejectRemovedFields` rejects a top-level `provider` field inside a provider block (it moved to the `providers.<id>` dict key) and top-level `maxRetries` / `maxRetryDelayMs` (removed; compose `dsh-llm-retry` instead). This template uses the dict key plus a nested `retryPolicy.maxRetries`, so neither triggers.
+- **Verified (2026-10-28)**: the desktop app on `0.2.1-rc.3` boots with this config unchanged — `/api` auth and the model catalog both behave normally.
+- Note: `0.2.1-rc.2` and `rc.3` belong to the same 0.2.1 line; only `rc.3` was tested this round, no shape difference observed.
 
 **0.2.0-rc.1 check (2026-09-28)**
 
@@ -192,7 +202,7 @@ Every config key comes from the official `dsh-llm` / `dsh-llm-pi-ai` schemas, so
 
 ## 📌 Document status (which files are "latest")
 
-**Target version: DSH `0.2.0-rc.1` (official `next`).**
+**Target version: DSH `0.2.1-rc.3` (official `next`; `latest` is still `0.2.0-rc.2`).**
 
 ⚠️ **Not every document in this repo has been rewritten alongside the latest version.** The table below states
 each file's actual status — judge reliability by the "Status" column:
@@ -201,7 +211,7 @@ each file's actual status — judge reliability by the "Status" column:
 |---|---|---|
 | `config/sensenova.yaml` | ✅ Up to date | **Single source of truth.** Model catalog updated (removed the delisted `deepseek-v4-pro`, added `deepseek-flash`); default model is `deepseek-v4-flash`. 2026-09-29: the inert `description` field became a comment; `off:` normalised to `off: null` |
 | `tools/dsh-profile-sync.mjs` | ✅ Verified | **Cross-surface sync tool** (zero dependencies): renders the template into each profile's sentinel region; `--check` detects drift, `--dry-run` previews. Measured: after syncing, both profiles' content lines were unchanged line-for-line and the provider objects were deep-equal |
-| `README.md` / `README.en.md` | ✅ Up to date | Includes the `0.2.0-rc.1` compatibility check and the cross-surface sync notes |
+| `README.md` / `README.en.md` | ✅ Up to date | Includes the `0.2.1-rc.3` / `0.2.0-rc.1` compatibility checks and the cross-surface sync notes |
 | `docs/retry-policy.md` | ➖ Version-independent | Retry mechanics and source-code basis; references no config path or version number, so it **needs no update per version** |
 | `docs/troubleshooting.md` | ➖ Version-independent | Rate-limit troubleshooting steps; same as above |
 | `SECURITY.md` | ➖ Version-independent | How to report vulnerabilities |

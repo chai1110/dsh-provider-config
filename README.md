@@ -3,7 +3,7 @@
 
 > 为 [DeepSeek Harness (DSH)](https://github.com/deepseek-ai/deepseek-harness) 提供**经过实战验证**的 LLM 供应商配置模板。当前聚焦 **SenseNova（商汤 Token Plan）**，结构可扩展到其他 OpenAI 兼容供应商。
 
-> **版本管理**：本仓库为纯配置模板，**不依赖特定 DSH 版本**（配置键通用于各版本，已核对到 **`0.2.0-rc.2`（官方 `latest` 与 `next`）**）；git tag 仅用于标记模板自身的发布点。
+> **版本管理**：本仓库为纯配置模板，**不依赖特定 DSH 版本**（配置键通用于各版本，已核对到 **`0.2.1-rc.3`（官方 `next`，`latest` 仍为 `0.2.0-rc.2`）**）；git tag 仅用于标记模板自身的发布点。
 
 ## 这个仓库给你什么
 
@@ -157,6 +157,7 @@ node tools/dsh-profile-sync.mjs              # 同步写入
 | DSH 版本 | 核对结果 | 依据 |
 |---|---|---|
 | `0.1.2-rc.1` | ✅ 模板基准版本 | — |
+| **`0.2.1-rc.3`（桌面版）** | ✅ **模板零改动；配置键与位置全部不变** | ⭐ 最新核对，2026-10-28（见下） |
 | **`0.1.5-rc.1`** | ✅ **模板无需改动** | 见下 |
 | **`0.1.7-rc.2`** | ✅ **配置键全部有效；⚠️ 配置位置迁移** | 见下 |
 | **`0.2.0-rc.2`** | ✅ **配置键全部有效；配置位置不变** | 见下 |
@@ -168,6 +169,15 @@ node tools/dsh-profile-sync.mjs              # 同步写入
 - `deepseek-v4-pro` 已从控制台下线 → 模板与示例配置移除（⚠️ API `/v1/models` 当时仍列出该 ID，但控制台计划不含即不可用）
 - 新增 `deepseek-flash`（DeepSeek V4.1 Flash，ctx 1M / maxout 65536，tools + json + reasoning）
 - **默认模型**（2026-09-27 实测后调整）：**`deepseek-v4-flash`** —— 双模型对比实测：4.1 端点 3/3 全部 429 秒拒（新模型全网拥挤，RPM/TPM 双超），V4 Flash 3/3 成功约 2 秒。`deepseek-flash`（V4.1 Flash）保留在清单作备选，高峰过后可切换
+
+**0.2.1-rc.3 核对（2026-10-28）—— 模板零改动**
+
+- **结论：本模板在新版上无需任何修改。** 配置键、字段类型、配置位置三项都对得上。
+- `dsh-llm` 仍导出 `RetryPolicySchema`：`backoffSchema` = `initialDelayMs` / `maxDelayMs` / `jitterRatio`，`normalPolicySchema` = `mode` / `maxRetries` / `retryableCodes` —— 与模板的 `retryPolicy` 段逐项对应
+- `dsh-llm-pi-ai` 的 provider profile schema 仍含 `displayName` / `apiKeyEnv` / `baseURL` / `api: openai-completions` / `defaultContextWindow` / `defaultMaxTokens` / `compat.{requiresReasoningContentOnAssistantMessages,supportsDeveloperRole}` / `reasoningEfforts` / `models`
+- ⚠️ **0.2.1 系列新增的两道守卫，本模板都不触发**：`rejectRemovedFields` 会拒绝 provider 块里的**顶层** `provider` 字段（已移到 `providers.<id>` 字典键）、以及**顶层** `maxRetries` / `maxRetryDelayMs`（已移除，改由 `dsh-llm-retry` 组合）。本模板用的是字典键 + `retryPolicy.maxRetries`（嵌套），两条都不中
+- **实测（2026-10-28）**：桌面版 `0.2.1-rc.3` 加载本配置启动正常，`/api` 鉴权与模型目录均正常，**无需改动任何配置值**
+- 备注：`0.2.1-rc.2` 与 `rc.3` 同属 0.2.1 系列，本轮只对 `rc.3` 实测；`rc.2` 的配置形状一致，未见差异
 
 **0.2.0-rc.2 核对（2026-09-29）**
 
@@ -202,7 +212,7 @@ node tools/dsh-profile-sync.mjs              # 同步写入
 
 ## 📌 文档状态（哪些是最新的）
 
-**目标版本：DSH `0.2.0-rc.1`（官方 `next`）。**
+**目标版本：DSH `0.2.1-rc.3`（官方 `next`；`latest` 仍为 `0.2.0-rc.2`）。**
 
 ⚠️ 本仓库**并非每个文档都随最新版同步重写过**。下表如实说明，请按「状态」列判断可信度：
 
@@ -210,7 +220,7 @@ node tools/dsh-profile-sync.mjs              # 同步写入
 |---|---|---|
 | `config/sensenova.yaml` | ✅ 已同步 | **唯一数据源**。模型目录已更新（移除下线的 `deepseek-v4-pro`、新增 `deepseek-flash`）；默认模型 `deepseek-v4-flash`。2026-09-29：惰性字段 `description` 改为注释、`off:` 统一为 `off: null` |
 | `tools/dsh-profile-sync.mjs` | ✅ 已实测 | **多面同步工具**（零依赖）：把上面的模板渲染进各 profile 的哨兵区间；`--check` 检测漂移、`--dry-run` 预览。实测同步后两个 profile 的内容行逐行未变、provider 对象深相等 |
-| `README.md` / `README.en.md` | ✅ 已同步 | 含 `0.2.0-rc.1` 兼容性核对记录 + 多面同步说明 |
+| `README.md` / `README.en.md` | ✅ 已同步 | 含 `0.2.1-rc.3` / `0.2.0-rc.1` 兼容性核对记录 + 多面同步说明 |
 | `docs/retry-policy.md` | ➖ 版本无关 | 重试机制原理与源码依据，不涉及配置路径或版本号，**无需随版本更新** |
 | `docs/troubleshooting.md` | ➖ 版本无关 | 限流排查步骤，同上 |
 | `SECURITY.md` | ➖ 与版本无关 | 漏洞上报联系方式 |

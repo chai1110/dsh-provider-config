@@ -1,7 +1,7 @@
 # Desktop (DeepSeek Harness Desktop) Configuration Guide
 
 > **Platform status**: the config itself is **platform-independent** (Windows / macOS / Linux all use
-> `~/.dsh/profiles/desktop/`), and it has been **verified on Windows (`0.2.0-rc.2`, 2026-09-29)**.
+> `~/.dsh/profiles/desktop/`), and it has been **verified on Windows (`0.2.0-rc.2`, 2026-09-29; `0.2.1-rc.3`, 2026-10-28)**.
 > The platform-specific part is *how the patches get into the asar* — see
 > [`dsh-custom-patches/desktop/`](https://github.com/chai1110/dsh-custom-patches/blob/main/desktop/README.md).
 

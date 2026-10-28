@@ -1,7 +1,7 @@
 # 桌面版（DeepSeek Harness Desktop）配置指南
 
 > **平台状态**：配置本身**与平台无关**（Windows / macOS / Linux 都是 `~/.dsh/profiles/desktop/`），
-> 已在 **Windows（`0.2.0-rc.2`，2026-09-29）** 实测。
+> 已在 **Windows（`0.2.0-rc.2`，2026-09-29；`0.2.1-rc.3`，2026-10-28）** 实测。
 > 真正有平台差异的是「补丁怎么打进 asar」—— 那部分见
 > [`dsh-custom-patches/desktop/`](https://github.com/chai1110/dsh-custom-patches/blob/main/desktop/README.md)。
 
